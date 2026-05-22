@@ -1,0 +1,1635 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>골든래빗 SQLD SQL 실습 환경</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EDEEF2;--bg2:#FFFFFF;--bg3:#F5F6F8;--bg4:#E9ECEF;
+  --primary:#F04B23;--primary2:#FF6B46;
+  --green:#1DB954;--blue:#3B82F6;--yellow:#D97706;
+  --text:#0F172A;--text2:#64748B;--text3:#94A3B8;--border:#E2E8F0;
+  --shadow:0 1px 3px rgba(0,0,0,0.06),0 6px 16px rgba(0,0,0,0.05);
+  --shadow-sm:0 1px 2px rgba(0,0,0,0.05);
+  --mono:'IBM Plex Mono',monospace;--sans:'Inter',-apple-system,'Segoe UI',sans-serif;
+  --radius:12px;--radius-sm:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13px;-webkit-font-smoothing:antialiased;}
+
+.app{display:flex;flex-direction:column;height:100vh;overflow:hidden;}
+
+/* ── Header ── */
+.hd{display:flex;align-items:center;padding:0 20px;height:58px;flex-shrink:0;
+  background:var(--bg2);border-bottom:1px solid var(--border);gap:0;
+  position:relative;box-shadow:0 1px 0 var(--border),0 2px 12px rgba(0,0,0,0.05);}
+.hd::before{content:'';position:absolute;left:0;right:0;top:0;height:3px;
+  background:linear-gradient(90deg,var(--primary) 0%,#F59E0B 50%,var(--primary2) 100%);pointer-events:none;}
+.hd-badge{font-size:9px;font-weight:800;color:var(--primary);letter-spacing:1.6px;
+  border:1.5px solid rgba(240,75,35,0.4);border-radius:7px;padding:3px 9px;flex-shrink:0;
+  background:rgba(240,75,35,0.07);text-transform:uppercase;}
+.hd-sep{width:1px;height:18px;background:var(--border);margin:0 14px;flex-shrink:0;}
+.hd-title{font-size:14px;font-weight:700;color:var(--text);flex-shrink:0;letter-spacing:-0.2px;}
+.hd-sub{font-size:10px;color:var(--text3);margin-left:9px;flex-shrink:0;
+  background:var(--bg3);border-radius:5px;padding:2px 8px;border:1px solid var(--border);
+  font-family:var(--mono);}
+.hd-space{flex:1;}
+.hd-status{font-size:11px;color:var(--text2);font-family:var(--mono);margin-right:12px;flex-shrink:0;}
+.btn-hd{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2);
+  background:var(--bg3);border:1px solid var(--border);border-radius:8px;
+  padding:6px 12px;cursor:pointer;transition:.15s;white-space:nowrap;font-weight:500;}
+.btn-hd:hover{background:var(--bg4);color:var(--text);border-color:var(--text3);}
+.btn-hd-primary{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:700;
+  color:#fff;background:linear-gradient(135deg,var(--primary) 0%,#FF5C35 100%);
+  border:none;border-radius:8px;padding:6px 13px;cursor:pointer;transition:.16s;
+  white-space:nowrap;font-family:var(--sans);
+  box-shadow:0 2px 8px rgba(240,75,35,0.4),0 1px 2px rgba(240,75,35,0.2);}
+.btn-hd-primary:hover{box-shadow:0 4px 16px rgba(240,75,35,0.5),0 1px 3px rgba(240,75,35,0.25);
+  transform:translateY(-1px);}
+.btn-hd-primary:active{transform:translateY(0) scale(.97);box-shadow:0 1px 5px rgba(240,75,35,0.3);}
+
+/* ── Body ── */
+.body{display:flex;flex:1;overflow:hidden;padding:10px;gap:7px;}
+
+/* ── Vertical resize handle ── */
+.v-resize{width:5px;background:transparent;cursor:col-resize;flex-shrink:0;
+  transition:.15s;position:relative;z-index:10;border-radius:3px;}
+.v-resize:hover,.v-resize.dragging{background:var(--primary);opacity:.35;}
+
+/* ── DB Panel ── */
+.db-panel{width:270px;background:var(--bg2);flex-shrink:0;display:flex;
+  flex-direction:column;border-radius:var(--radius);overflow:hidden;
+  box-shadow:var(--shadow);border:1px solid var(--border);transition:width .22s ease;}
+.db-panel.collapsed{width:28px;border:1px solid var(--border);box-shadow:none;}
+.db-panel.collapsed .db-panel-hd,.db-panel.collapsed .db-scroll{display:none;}
+.db-panel-hd{display:flex;align-items:center;padding:11px 12px;flex-shrink:0;
+  border-bottom:1px solid var(--border);gap:7px;
+  background:linear-gradient(160deg,var(--bg3) 0%,rgba(240,75,35,0.025) 100%);}
+.db-panel-label{font-size:9px;font-weight:800;color:var(--primary);letter-spacing:1.6px;text-transform:uppercase;flex-shrink:0;}
+.schema-search{flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:7px;
+  padding:5px 9px;font-size:11px;color:var(--text);outline:none;min-width:0;transition:.15s;}
+.schema-search::placeholder{color:var(--text3);}
+.schema-search:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(240,75,35,0.1);}
+.btn-panel-toggle{background:transparent;border:none;color:var(--text3);cursor:pointer;
+  padding:4px;display:flex;align-items:center;font-size:15px;flex-shrink:0;border-radius:6px;transition:.12s;}
+.btn-panel-toggle:hover{color:var(--primary);background:rgba(240,75,35,0.09);}
+.panel-strip{display:none;align-items:center;justify-content:center;
+  width:100%;height:100%;cursor:pointer;color:var(--text3);font-size:17px;
+  transition:.15s;border-radius:var(--radius);}
+.panel-strip:hover{color:var(--primary);background:rgba(240,75,35,0.07);}
+.db-panel.collapsed .panel-strip,.ex-panel-wrap.collapsed .panel-strip{display:flex;}
+.db-scroll{flex:1;overflow-y:auto;}
+.db-scroll::-webkit-scrollbar{width:3px;}
+.db-scroll::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px;}
+
+.tbl-hd{display:flex;align-items:center;gap:7px;padding:9px 14px;cursor:pointer;
+  color:var(--text2);font-size:12px;font-family:var(--mono);transition:.12s;user-select:none;}
+.tbl-hd:hover{background:var(--bg3);color:var(--text);}
+.tbl-hd.open{background:rgba(240,75,35,0.06);color:var(--primary);}
+.tbl-hd-name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500;}
+.tbl-hd-name:hover{color:var(--primary);}
+.tbl-rows-badge{font-size:9px;color:var(--text3);background:var(--bg4);
+  border-radius:9px;padding:1px 6px;flex-shrink:0;font-family:var(--sans);}
+.chevron{font-size:11px;transition:transform .2s;color:var(--text3);flex-shrink:0;}
+.tbl-hd.open .chevron{transform:rotate(90deg);color:var(--primary);}
+.tbl-cols{display:none;padding:2px 0 8px 32px;}
+.tbl-cols.open{display:block;}
+.col-item{display:flex;align-items:center;gap:5px;padding:3px 10px 3px 0;cursor:pointer;
+  font-size:11px;color:var(--text3);font-family:var(--mono);border-radius:5px;transition:.1s;margin:1px 0;}
+.col-item:hover{background:rgba(59,130,246,0.06);padding-left:4px;}
+.col-item:hover .col-name{color:var(--blue);}
+.col-name{flex:1;}
+.col-type{font-size:9px;opacity:.55;}
+.badge{font-size:8px;font-weight:700;border-radius:3px;padding:0 3px;line-height:1.5;flex-shrink:0;}
+.badge-pk{color:#DC2626;border:1px solid rgba(220,38,38,0.4);background:rgba(220,38,38,0.06);}
+.badge-fk{color:var(--blue);border:1px solid rgba(59,130,246,0.35);background:rgba(59,130,246,0.06);}
+
+/* ── Work area ── */
+.work{flex:1;display:flex;flex-direction:column;min-width:0;background:var(--bg2);
+  border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;border:1px solid var(--border);}
+.tab-bar{display:flex;align-items:center;padding:0 14px;height:48px;flex-shrink:0;
+  background:var(--bg3);border-bottom:1px solid var(--border);gap:2px;}
+.tab{display:flex;align-items:center;gap:6px;padding:0 14px;height:48px;border:none;
+  background:transparent;font-size:12px;color:var(--text2);cursor:pointer;
+  border-bottom:2px solid transparent;transition:.12s;font-family:var(--sans);font-weight:500;}
+.tab:hover{color:var(--text);}
+.tab.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:700;}
+.tab-space{flex:1;}
+.btn-sm{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text2);
+  background:var(--bg3);border:1px solid var(--border);border-radius:7px;
+  padding:6px 11px;cursor:pointer;transition:.13s;font-family:var(--sans);font-weight:500;}
+.btn-sm:hover{color:var(--text);background:var(--bg4);border-color:var(--text3);}
+.btn-run{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;
+  color:#fff;background:linear-gradient(135deg,var(--primary) 0%,#FF5C35 100%);
+  border:none;border-radius:9px;padding:7px 18px;cursor:pointer;transition:.16s;
+  margin-left:8px;font-family:var(--sans);
+  box-shadow:0 2px 10px rgba(240,75,35,0.38),0 1px 2px rgba(240,75,35,0.2);}
+.btn-run:hover{box-shadow:0 4px 18px rgba(240,75,35,0.48),0 1px 3px rgba(240,75,35,0.25);transform:translateY(-1px);}
+.btn-run:active{transform:translateY(0) scale(.97);box-shadow:0 1px 6px rgba(240,75,35,0.3);}
+.btn-run:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none;}
+.btn-run .spin{display:none;}
+.btn-run.loading .spin{display:inline;}
+.btn-run.loading .icon{display:none;}
+
+/* ── Editor ── */
+.editor-wrap{flex-shrink:0;height:220px;overflow:hidden;position:relative;}
+.editor-status{display:flex;align-items:center;justify-content:space-between;
+  padding:0 16px;height:26px;flex-shrink:0;
+  background:var(--bg3);border-bottom:1px solid var(--border);}
+.editor-status span{font-size:10px;color:var(--text3);font-family:var(--mono);}
+
+/* CodeMirror overrides */
+.cm-editor{height:100% !important;}
+.cm-scroller{overflow:auto !important;font-family:var(--mono) !important;font-size:13px !important;line-height:1.75 !important;}
+.cm-focused{outline:none !important;}
+
+/* ── Drag handle (H) ── */
+.h-resize{height:6px;background:var(--bg3);border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);cursor:ns-resize;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;transition:.12s;}
+.h-resize::after{content:'';width:32px;height:2px;background:var(--border);border-radius:2px;transition:.12s;}
+.h-resize:hover::after,.h-resize.dragging::after{background:var(--primary);width:40px;}
+.h-resize:hover{background:rgba(240,75,35,0.03);}
+
+/* ── Result ── */
+.result-area{flex:1;display:flex;flex-direction:column;min-height:0;}
+.result-bar{display:flex;align-items:center;padding:0 16px;height:36px;flex-shrink:0;
+  background:var(--bg3);border-bottom:1px solid var(--border);gap:8px;}
+.result-label{font-size:9px;font-weight:800;color:var(--text3);letter-spacing:1.6px;text-transform:uppercase;}
+.result-meta{font-size:11px;font-family:var(--mono);color:var(--text2);font-weight:500;}
+.result-time{font-size:10px;color:var(--text3);font-family:var(--mono);}
+.result-bar-space{flex:1;}
+.result-scroll{flex:1;overflow:auto;}
+.result-scroll::-webkit-scrollbar{width:5px;height:5px;}
+.result-scroll::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px;}
+.result-placeholder{display:flex;flex-direction:column;align-items:center;
+  justify-content:center;height:100%;gap:12px;color:var(--text3);}
+.result-placeholder i{font-size:36px;opacity:.5;}
+.result-placeholder p{font-size:12px;font-weight:500;}
+.rtable-wrap{padding:12px 16px;}
+.rtable-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.rtable-title-text{font-size:9px;font-weight:700;color:var(--text3);
+  font-family:var(--mono);letter-spacing:1px;text-transform:uppercase;}
+.rtable{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:16px;border-radius:8px;overflow:hidden;}
+.rtable th{position:sticky;top:0;background:var(--bg3);color:var(--text2);
+  padding:8px 14px;text-align:left;border-bottom:2px solid var(--border);
+  font-family:var(--mono);font-size:11px;white-space:nowrap;z-index:2;
+  cursor:pointer;user-select:none;font-weight:600;}
+.rtable th:hover{color:var(--text);background:var(--bg4);}
+.rtable th .sort-icon{margin-left:4px;opacity:.35;font-size:10px;}
+.rtable th.sorted-asc .sort-icon,.rtable th.sorted-desc .sort-icon{opacity:1;color:var(--blue);}
+.rtable td{padding:7px 14px;border-bottom:1px solid var(--border);
+  font-family:var(--mono);font-size:12px;white-space:nowrap;}
+.rtable tbody tr:hover td{background:rgba(240,75,35,0.025);}
+.rtable tbody tr:last-child td{border-bottom:none;}
+.val-num{color:#1D4ED8;}
+.val-str{color:#166534;}
+.val-null{color:var(--text3);font-style:italic;}
+.msg-box{margin:14px 16px;padding:13px 16px;border-radius:10px;font-size:12px;line-height:1.7;}
+.msg-ok{background:rgba(29,185,84,0.05);border:1px solid rgba(29,185,84,0.2);
+  color:#15803D;display:flex;align-items:flex-start;gap:10px;}
+.msg-err{background:rgba(239,68,68,0.05);border:1px solid rgba(239,68,68,0.2);
+  color:#DC2626;font-family:var(--mono);}
+.oracle-hint{margin:0 16px 12px;padding:10px 14px;border-left:3px solid var(--yellow);
+  background:rgba(217,119,6,0.05);border-radius:0 8px 8px 0;}
+.oracle-hint-title{font-size:10px;font-weight:700;color:var(--yellow);
+  letter-spacing:.8px;margin-bottom:5px;text-transform:uppercase;}
+.oracle-hint ul{padding-left:14px;font-size:11px;color:#92400E;}
+.oracle-hint li{margin-top:3px;line-height:1.6;}
+/* ── Env Chip ── */
+.env-chip{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--primary);
+  background:rgba(240,75,35,0.07);border:1px solid rgba(240,75,35,0.2);border-radius:8px;
+  padding:5px 11px;cursor:pointer;transition:.14s;white-space:nowrap;font-weight:600;
+  margin-right:10px;font-family:var(--sans);}
+.env-chip:hover{background:rgba(240,75,35,0.13);border-color:rgba(240,75,35,0.4);transform:translateY(-1px);}
+.env-chip .chip-icon{font-size:13px;}
+.env-chip .chip-arrow{font-size:10px;opacity:.5;}
+
+/* ── 자동 변환 배지 ── */
+.convert-notice{display:flex;align-items:flex-start;gap:8px;margin:12px 16px 0;
+  padding:9px 13px;background:rgba(240,75,35,0.05);border:1px solid rgba(240,75,35,0.18);
+  border-radius:8px;font-size:11px;color:var(--primary);line-height:1.6;}
+.convert-notice i{font-size:14px;flex-shrink:0;margin-top:1px;}
+.convert-notice code{background:rgba(240,75,35,0.1);border-radius:4px;padding:1px 5px;
+  font-family:var(--mono);font-size:10.5px;font-weight:600;}
+
+/* ── Modal ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,0.45);z-index:2000;
+  display:flex;align-items:center;justify-content:center;
+  backdrop-filter:blur(4px);opacity:0;transition:.22s;pointer-events:none;}
+.modal-overlay.show{opacity:1;pointer-events:all;}
+.modal{background:var(--bg2);border-radius:16px;width:500px;max-width:94vw;max-height:90vh;
+  box-shadow:0 32px 80px rgba(0,0,0,0.2),0 4px 16px rgba(0,0,0,0.1);
+  transform:translateY(20px) scale(.96);overflow:hidden;display:flex;flex-direction:column;
+  transition:.24s cubic-bezier(.34,1.4,.64,1);}
+.modal-overlay.show .modal{transform:translateY(0) scale(1);}
+.modal-hd{display:flex;align-items:center;justify-content:space-between;
+  padding:20px 22px 16px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.modal-hd-left{display:flex;align-items:center;gap:10px;}
+.modal-hd-icon{width:34px;height:34px;border-radius:9px;background:rgba(240,75,35,0.1);
+  display:flex;align-items:center;justify-content:center;font-size:17px;color:var(--primary);}
+.modal-title{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.2px;}
+.modal-subtitle{font-size:11px;color:var(--text3);margin-top:1px;}
+.modal-close{background:transparent;border:none;color:var(--text3);cursor:pointer;
+  font-size:18px;padding:4px;border-radius:6px;display:flex;align-items:center;transition:.12s;}
+.modal-close:hover{color:var(--text);background:var(--bg4);}
+.modal-body{padding:20px 22px;display:flex;flex-direction:column;gap:20px;overflow-y:auto;flex:1;}
+.modal-body::-webkit-scrollbar{width:4px;}
+.modal-body::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px;}
+.modal-section-title{font-size:10px;font-weight:800;color:var(--text3);letter-spacing:1.4px;
+  text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.modal-section-title::before{content:'';width:3px;height:10px;background:var(--primary);
+  border-radius:2px;flex-shrink:0;}
+.modal-section p{font-size:12.5px;color:var(--text2);line-height:1.7;}
+.modal-env-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(29,185,84,0.08);
+  border:1px solid rgba(29,185,84,0.2);border-radius:6px;padding:4px 10px;
+  font-size:11.5px;color:#166534;font-weight:600;margin-bottom:10px;}
+.modal-diff-table{border:1px solid var(--border);border-radius:10px;overflow:hidden;font-size:12px;margin-top:4px;}
+.diff-row{display:grid;grid-template-columns:1fr 1.5fr;border-bottom:1px solid var(--border);}
+.diff-row:last-child{border-bottom:none;}
+.diff-row.diff-header{background:var(--bg3);}
+.diff-row.diff-header span{font-size:9px;font-weight:800;color:var(--text3);letter-spacing:1.2px;text-transform:uppercase;}
+.diff-row span{padding:8px 13px;font-family:var(--mono);}
+.diff-row:not(.diff-header) span:first-child{color:#DC2626;background:rgba(220,38,38,0.03);}
+.diff-row:not(.diff-header) span:last-child{color:#166534;font-weight:500;}
+.modal-shortcuts{display:flex;flex-direction:column;gap:8px;}
+.shortcut-row{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text2);}
+.shortcut-row .shortcut-keys{display:flex;align-items:center;gap:3px;min-width:110px;}
+.shortcut-row .shortcut-desc{color:var(--text2);}
+kbd{background:var(--bg3);border:1px solid var(--border);border-bottom:2px solid var(--border);
+  border-radius:5px;padding:2px 7px;font-size:10px;font-family:var(--mono);
+  color:var(--text);font-weight:600;}
+.modal-ft{display:flex;align-items:center;justify-content:space-between;
+  padding:14px 22px;border-top:1px solid var(--border);background:var(--bg3);flex-shrink:0;}
+.modal-no-show{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text2);cursor:pointer;user-select:none;}
+.modal-no-show input{cursor:pointer;accent-color:var(--primary);width:14px;height:14px;}
+.btn-modal-start{background:linear-gradient(135deg,var(--primary) 0%,#FF5C35 100%);
+  color:#fff;border:none;border-radius:9px;padding:9px 22px;font-size:13px;font-weight:700;
+  cursor:pointer;transition:.15s;font-family:var(--sans);
+  box-shadow:0 2px 10px rgba(240,75,35,0.35);}
+.btn-modal-start:hover{box-shadow:0 4px 18px rgba(240,75,35,0.45);transform:translateY(-1px);}
+
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(16px);
+  background:var(--text);border-radius:10px;padding:10px 20px;font-size:12px;color:#fff;font-weight:500;
+  opacity:0;transition:.28s cubic-bezier(.34,1.56,.64,1);pointer-events:none;z-index:999;
+  box-shadow:0 8px 24px rgba(0,0,0,0.18);}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ── Example Panel ── */
+.ex-panel-wrap{width:360px;background:var(--bg2);flex-shrink:0;display:flex;
+  flex-direction:column;border-radius:var(--radius);box-shadow:var(--shadow);
+  overflow:hidden;border:1px solid var(--border);transition:width .22s ease;}
+.ex-panel-wrap.collapsed{width:28px;border:1px solid var(--border);box-shadow:none;}
+.ex-panel-wrap.collapsed .ex-hd,.ex-panel-wrap.collapsed .ex-filter,.ex-panel-wrap.collapsed .ex-scroll{display:none;}
+.ex-hd{display:flex;align-items:center;padding:13px 14px;flex-shrink:0;
+  border-bottom:1px solid var(--border);gap:8px;
+  background:linear-gradient(160deg,var(--bg3) 0%,rgba(240,75,35,0.03) 100%);}
+.ex-hd-title{font-size:13px;font-weight:700;color:var(--text);flex:1;letter-spacing:-0.2px;}
+.ex-progress{font-size:10px;color:var(--primary);font-family:var(--mono);font-weight:600;
+  background:rgba(240,75,35,0.08);border:1px solid rgba(240,75,35,0.15);
+  border-radius:12px;padding:2px 10px;}
+.btn-panel-toggle-r{background:transparent;border:none;color:var(--text3);cursor:pointer;
+  padding:4px;display:flex;align-items:center;font-size:15px;border-radius:6px;transition:.12s;}
+.btn-panel-toggle-r:hover{color:var(--primary);background:rgba(240,75,35,0.09);}
+.ex-filter{padding:10px 10px 0;flex-shrink:0;}
+.cat-pills{display:flex;gap:5px;flex-wrap:wrap;padding-bottom:10px;
+  border-bottom:1px solid var(--border);}
+.cat-pill{font-size:10px;padding:4px 10px;border-radius:14px;border:1px solid var(--border);
+  background:var(--bg3);color:var(--text2);cursor:pointer;transition:.13s;
+  white-space:nowrap;font-weight:500;}
+.cat-pill:hover{border-color:rgba(240,75,35,0.4);color:var(--primary);background:rgba(240,75,35,0.04);}
+.cat-pill.active{background:var(--primary);border-color:var(--primary);color:#fff;font-weight:600;
+  box-shadow:0 2px 8px rgba(240,75,35,0.3);}
+.ex-scroll{flex:1;overflow-y:auto;padding:10px;}
+.ex-scroll::-webkit-scrollbar{width:3px;}
+.ex-scroll::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px;}
+.ex-group-title{font-size:9px;font-weight:800;color:var(--primary);letter-spacing:1.4px;
+  text-transform:uppercase;margin:14px 0 7px;padding:0 2px 6px;
+  border-bottom:1.5px solid rgba(240,75,35,0.15);display:flex;align-items:center;gap:6px;}
+.ex-group-title:first-child{margin-top:2px;}
+.ex-group-title::before{content:'';width:3px;height:10px;background:var(--primary);
+  border-radius:2px;flex-shrink:0;}
+.ex-item{padding:11px 12px;border:1px solid var(--border);border-radius:10px;
+  margin-bottom:7px;cursor:pointer;transition:.15s;display:flex;align-items:flex-start;gap:9px;
+  background:var(--bg2);}
+.ex-item:hover{border-color:rgba(240,75,35,0.35);background:rgba(240,75,35,0.015);
+  box-shadow:0 4px 14px rgba(240,75,35,0.09);transform:translateY(-1px);}
+.ex-item.done{opacity:.45;}
+.ex-item.done .ex-item-title{text-decoration:line-through;}
+.ex-item-body{flex:1;min-width:0;}
+.ex-item-title{font-size:12.5px;font-weight:600;color:var(--text);line-height:1.35;}
+.ex-item-desc{font-size:11px;color:var(--text2);margin-top:3px;line-height:1.45;}
+.ex-check{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--border);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;
+  transition:.14s;cursor:pointer;}
+.ex-check:hover{border-color:var(--green);background:rgba(29,185,84,0.07);}
+.ex-item.done .ex-check{background:var(--green);border-color:var(--green);color:#fff;}
+.ex-check i{font-size:10px;}
+.ex-empty{padding:30px 20px;text-align:center;color:var(--text3);font-size:12px;}
+.ex-item-footer{display:flex;gap:6px;margin-top:9px;padding-top:9px;border-top:1px solid var(--border);}
+.ex-hint-btn,.ex-sol-btn{font-size:10px;padding:4px 10px;border-radius:12px;border:none;cursor:pointer;transition:.13s;font-family:var(--sans);font-weight:600;line-height:1.4;}
+.ex-hint-btn{background:rgba(240,75,35,0.08);color:var(--primary);border:1px solid rgba(240,75,35,0.15);}
+.ex-hint-btn:hover{background:rgba(240,75,35,0.14);}
+.ex-hint-btn.open{background:var(--primary);color:#fff;border-color:var(--primary);}
+.ex-sol-btn{background:rgba(59,130,246,0.08);color:var(--blue);border:1px solid rgba(59,130,246,0.15);}
+.ex-sol-btn:hover{background:rgba(59,130,246,0.14);}
+.ex-sol-btn.open{background:var(--blue);color:#fff;border-color:var(--blue);}
+.ex-expand-box{display:none;margin-top:8px;padding:10px 12px;border-radius:8px;font-size:11px;color:var(--text2);line-height:1.65;white-space:pre-wrap;}
+.ex-expand-box.hint-box{background:rgba(240,75,35,0.04);border-left:3px solid var(--primary);}
+.ex-expand-box.sol-box{background:rgba(59,130,246,0.04);border-left:3px solid var(--blue);}
+/* ── Oracle 미지원 힌트 ── */
+.oracle-unsupported-hint{margin:8px 16px 0;padding:10px 14px;border-radius:8px;font-size:11.5px;
+  color:#92400E;background:rgba(217,119,6,0.07);border:1px solid rgba(217,119,6,0.25);line-height:1.65;}
+.oracle-unsupported-hint strong{font-weight:700;}
+/* ── 도서 프로모 카드 ── */
+.book-promo{display:flex;align-items:center;gap:11px;padding:12px 14px;
+  border-top:1px solid var(--border);text-decoration:none;background:var(--bg3);
+  flex-shrink:0;transition:.15s;cursor:pointer;}
+.book-promo:hover{background:rgba(240,75,35,0.05);}
+.book-promo:hover .book-promo-cta{color:var(--primary2);}
+.db-panel.collapsed .book-promo{display:none;}
+.book-promo-img{width:46px;height:64px;object-fit:cover;border-radius:5px;flex-shrink:0;
+  box-shadow:0 2px 10px rgba(0,0,0,0.18);}
+.book-promo-info{flex:1;min-width:0;}
+.book-promo-badge{font-size:8px;font-weight:800;color:var(--primary);letter-spacing:1.4px;
+  text-transform:uppercase;margin-bottom:4px;}
+.book-promo-title{font-size:11.5px;font-weight:700;color:var(--text);line-height:1.35;
+  margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.book-promo-author{font-size:10px;color:var(--text3);margin-bottom:5px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.book-promo-cta{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;
+  color:var(--primary);transition:.13s;}
+/* ── 진행도 초기화 버튼 ── */
+.btn-progress-reset{display:flex;align-items:center;gap:4px;font-size:10px;font-weight:600;
+  color:var(--text3);background:transparent;border:1px solid transparent;border-radius:6px;
+  padding:3px 7px;cursor:pointer;transition:.13s;font-family:var(--sans);white-space:nowrap;}
+.btn-progress-reset:hover{color:#DC2626;border-color:rgba(220,38,38,0.3);background:rgba(220,38,38,0.06);}
+.btn-progress-reset i{font-size:12px;}
+/* ── 인라인 CSV 버튼 ── */
+.btn-csv-inline{display:flex;align-items:center;gap:3px;font-size:10px;color:var(--text2);
+  background:var(--bg3);border:1px solid var(--border);border-radius:5px;
+  padding:3px 8px;cursor:pointer;transition:.12s;font-weight:500;}
+.btn-csv-inline:hover{color:var(--green);border-color:rgba(29,185,84,0.5);background:rgba(29,185,84,0.05);}
+/* ── 가이드 모달 ── */
+.guide-modal{width:760px;}
+.guide-body{gap:26px;}
+.guide-layout{display:grid;grid-template-columns:1fr 1.6fr 1fr;gap:8px;margin-bottom:12px;}
+.guide-layout-item{border:1px solid var(--border);border-radius:10px;padding:14px 10px;
+  background:var(--bg3);text-align:center;}
+.guide-layout-center{border-color:rgba(240,75,35,0.3);background:rgba(240,75,35,0.04);}
+.guide-layout-label{font-size:20px;font-weight:800;color:var(--primary);margin-bottom:5px;}
+.guide-layout-name{font-size:13.5px;font-weight:700;color:var(--text);margin-bottom:5px;}
+.guide-layout-desc{font-size:12.5px;color:var(--text2);line-height:1.65;}
+.guide-list{padding-left:18px;}
+.guide-list li{font-size:13.5px;color:var(--text2);line-height:1.7;margin-bottom:9px;}
+.guide-list li:last-child{margin-bottom:0;}
+.guide-list li strong{color:var(--text);}
+.guide-list li code{background:var(--bg3);border:1px solid var(--border);border-radius:4px;
+  padding:1px 6px;font-family:var(--mono);font-size:12.5px;color:var(--text);}
+.guide-db-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:12px;}
+.guide-db-item{display:flex;align-items:center;gap:10px;padding:10px 14px;
+  background:var(--bg3);border:1px solid var(--border);border-radius:8px;}
+.guide-db-name{font-size:12px;font-weight:700;color:var(--primary);font-family:var(--mono);
+  flex-shrink:0;min-width:82px;}
+.guide-db-desc{font-size:12px;color:var(--text);flex:1;}
+.guide-db-rows{font-size:10.5px;color:var(--text2);background:var(--bg4);
+  border-radius:8px;padding:2px 8px;flex-shrink:0;font-family:var(--mono);font-weight:600;}
+.guide-tip{padding:12px 16px;background:rgba(59,130,246,0.05);border:1px solid rgba(59,130,246,0.2);
+  border-radius:8px;font-size:13.5px;color:#1D4ED8;line-height:1.7;}
+.guide-warning{padding:12px 16px;background:rgba(217,119,6,0.06);border:1px solid rgba(217,119,6,0.25);
+  border-radius:8px;font-size:13.5px;color:#92400E;line-height:1.7;}
+</style>
+</head>
+<body>
+<div class="app">
+
+<header class="hd">
+  <span class="hd-badge">GOLDENRABBIT</span>
+  <div class="hd-sep"></div>
+  <span class="hd-title">SQLD SQL 실습 환경</span>
+  <span class="hd-sub">SQL.js · SQLite</span>
+  <div class="hd-space"></div>
+  <button class="env-chip" id="env-chip">
+    <i class="ti ti-arrows-exchange chip-icon"></i>
+    Oracle 문법 자동 변환 지원
+    <i class="ti ti-chevron-right chip-arrow"></i>
+  </button>
+  <button class="btn-hd-primary" id="btn-guide"><i class="ti ti-help-circle"></i> 사용 가이드</button>
+</header>
+
+<div class="body">
+
+  <!-- 좌: DB 스키마 패널 -->
+  <aside class="db-panel" id="db-panel">
+    <div class="panel-strip" id="db-panel-strip" title="패널 펼치기">
+      <i class="ti ti-layout-sidebar-left-expand"></i>
+    </div>
+    <div class="db-panel-hd">
+      <span class="db-panel-label">Schema</span>
+      <input class="schema-search" id="schema-search" placeholder="검색..." type="text">
+      <button class="btn-panel-toggle" id="btn-toggle-left" title="패널 접기">
+        <i class="ti ti-layout-sidebar-left-collapse"></i>
+      </button>
+    </div>
+    <div class="db-scroll" id="db-scroll"></div>
+    <a class="book-promo" href="https://goldenrabbit.co.kr/books/9791194383710" target="_blank" rel="noopener">
+      <img class="book-promo-img" src="https://lh3.googleusercontent.com/d/1UnYyuUHu8UNAIeTo6jo3KWubBONNBAls=w200" alt="2026 빠르게 따는 SQLD 표지">
+      <div class="book-promo-info">
+        <div class="book-promo-badge">교재 안내</div>
+        <div class="book-promo-title">2026 빠르게 따는 SQLD</div>
+        <div class="book-promo-author">이유성 · 조영훈 · 임한울</div>
+        <div class="book-promo-cta"><i class="ti ti-shopping-cart" style="font-size:11px;"></i> 구매하기</div>
+      </div>
+    </a>
+  </aside>
+
+  <!-- 좌우 드래그 핸들 (좌) -->
+  <div class="v-resize" id="left-resize"></div>
+
+  <!-- 중: 에디터 + 결과 -->
+  <main class="work" id="work">
+    <div class="tab-bar">
+      <button class="tab active" id="tab-query" data-tab="query">
+        <i class="ti ti-terminal-2"></i> SQL 쿼리
+      </button>
+      <button class="tab" id="tab-ddl" data-tab="ddl">
+        <i class="ti ti-table-plus"></i> DDL / DML
+      </button>
+      <div class="tab-space"></div>
+      <button class="btn-sm" id="btn-clear"><i class="ti ti-eraser"></i> 초기화</button>
+      <button class="btn-run" id="btn-run">
+        <i class="ti ti-player-play-filled icon"></i>
+        <i class="ti ti-loader spin" style="animation:spin .8s linear infinite;"></i>
+        실행 <span style="font-size:10px;opacity:.7;font-weight:400;">Ctrl+↵</span>
+      </button>
+    </div>
+    <div class="editor-wrap" id="editor-wrap">
+      <!-- CodeMirror mounts here -->
+    </div>
+    <div class="editor-status">
+      <span id="cursor-pos">Ln 1, Col 1</span>
+      <span id="editor-hint" style="font-size:10px;">Ctrl+/ 주석 · Ctrl+Z 실행취소</span>
+    </div>
+    <div class="h-resize" id="h-resize"></div>
+    <div class="result-area">
+      <div class="result-bar">
+        <span class="result-label">RESULT</span>
+        <span class="result-meta" id="r-meta"></span>
+        <span class="result-time" id="r-time"></span>
+        <div class="result-bar-space"></div>
+      </div>
+      <div class="result-scroll" id="r-scroll">
+        <div class="result-placeholder">
+          <i class="ti ti-player-play"></i>
+          <p>SQL을 작성하고 실행해보세요</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 좌우 드래그 핸들 (우) -->
+  <div class="v-resize" id="right-resize"></div>
+
+  <!-- 우: 예제 패널 -->
+  <aside class="ex-panel-wrap" id="ex-panel-wrap">
+    <div class="panel-strip" id="ex-panel-strip" title="패널 펼치기">
+      <i class="ti ti-layout-sidebar-right-expand"></i>
+    </div>
+    <div class="ex-hd">
+      <i class="ti ti-book-2" style="color:var(--primary);font-size:15px;"></i>
+      <span class="ex-hd-title">학습 예제 가이드</span>
+      <span class="ex-progress" id="ex-progress">0 / 0</span>
+      <button class="btn-progress-reset" id="btn-progress-reset">
+        <i class="ti ti-rotate-clockwise"></i> 초기화
+      </button>
+      <button class="btn-panel-toggle-r" id="btn-toggle-right" title="패널 접기">
+        <i class="ti ti-layout-sidebar-right-collapse"></i>
+      </button>
+    </div>
+    <div class="ex-filter" id="ex-filter"></div>
+    <div class="ex-scroll" id="ex-panel"></div>
+  </aside>
+
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- 안내 모달 -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <div class="modal-hd">
+      <div class="modal-hd-left">
+        <div class="modal-hd-icon"><i class="ti ti-book-2"></i></div>
+        <div>
+          <div class="modal-title">SQLD SQL 실습 환경 안내</div>
+          <div class="modal-subtitle">Oracle 문법을 그대로 입력하세요 — 자동으로 변환됩니다</div>
+        </div>
+      </div>
+      <button class="modal-close" id="modal-close"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="modal-body">
+
+      <div>
+        <div class="modal-section-title">Oracle 문법 자동 변환</div>
+        <p style="margin-bottom:10px;">Oracle 문법을 <strong>그대로 입력하고 실행</strong>하면 자동으로 SQLite 문법으로 변환됩니다.<br>변환된 항목은 실행 결과 상단에 표시됩니다.</p>
+        <div class="modal-diff-table">
+          <div class="diff-row diff-header"><span>Oracle 입력</span><span>자동 변환 결과</span></div>
+          <div class="diff-row"><span>NVL(COMM, 0)</span><span>IFNULL(COMM, 0)</span></div>
+          <div class="diff-row"><span>MOD(SAL, 1000)</span><span>(SAL % 1000)</span></div>
+          <div class="diff-row"><span>SYSDATE</span><span>date('now')</span></div>
+          <div class="diff-row"><span>WHERE ROWNUM &lt;= 5</span><span>LIMIT 5</span></div>
+          <div class="diff-row"><span>MINUS</span><span>EXCEPT</span></div>
+          <div class="diff-row"><span>TO_CHAR(dt, 'YYYY')</span><span>STRFTIME('%Y', dt)</span></div>
+          <div class="diff-row"><span>TO_DATE(str, fmt)</span><span>date(str)</span></div>
+          <div class="diff-row"><span>ADD_MONTHS(dt, 3)</span><span>date(dt, '+3 month')</span></div>
+        </div>
+        <p style="margin-top:10px;font-size:11px;color:var(--text3);">※ CONNECT BY, DECODE(), NVL2() 등 복잡한 Oracle 전용 문법은 자동 변환이 어렵습니다.<br>우측 예제 패널에서 SQLite 대체 문법을 확인하세요.</p>
+      </div>
+
+      <div style="padding:12px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;font-size:12px;color:var(--text2);line-height:1.7;">
+        💡 단축키, 테이블 목록, 주의사항 등 자세한 사용법은 상단 <strong style="color:var(--primary);">사용 가이드</strong> 버튼에서 확인하세요.
+      </div>
+
+    </div>
+    <div class="modal-ft">
+      <label class="modal-no-show">
+        <input type="checkbox" id="no-show-check">
+        <span>다시 보지 않기</span>
+      </label>
+      <button class="btn-modal-start" id="btn-modal-start">시작하기 →</button>
+    </div>
+  </div>
+</div>
+<!-- 사용 가이드 모달 -->
+<div class="modal-overlay" id="guide-overlay">
+  <div class="modal guide-modal">
+    <div class="modal-hd">
+      <div class="modal-hd-left">
+        <div class="modal-hd-icon"><i class="ti ti-book-2"></i></div>
+        <div>
+          <div class="modal-title">사용 가이드</div>
+          <div class="modal-subtitle">처음 사용하는 분을 위한 완전 가이드</div>
+        </div>
+      </div>
+      <button class="modal-close" id="guide-close"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="modal-body guide-body">
+
+      <!-- 1. 화면 구성 -->
+      <div>
+        <div class="modal-section-title">1 · 화면 구성 한눈에 보기</div>
+        <div class="guide-layout">
+          <div class="guide-layout-item">
+            <div class="guide-layout-label">①</div>
+            <div class="guide-layout-name">스키마 패널</div>
+            <div class="guide-layout-desc">테이블·컬럼 목록<br>클릭으로 SQL 삽입</div>
+          </div>
+          <div class="guide-layout-item guide-layout-center">
+            <div class="guide-layout-label">②</div>
+            <div class="guide-layout-name">SQL 에디터 + 결과</div>
+            <div class="guide-layout-desc">쿼리 작성·실행<br>결과 테이블 확인</div>
+          </div>
+          <div class="guide-layout-item">
+            <div class="guide-layout-label">③</div>
+            <div class="guide-layout-name">예제 패널</div>
+            <div class="guide-layout-desc">56개 예제<br>힌트·해설·완료 체크</div>
+          </div>
+        </div>
+        <ul class="guide-list">
+          <li>각 패널 경계를 <strong>드래그</strong>해 너비 조절 가능</li>
+          <li>에디터와 결과창 사이 <strong>가로 핸들</strong>로 높이 조절, 새로고침 후에도 유지</li>
+          <li>패널 헤더의 <i class="ti ti-layout-sidebar-left-collapse" style="vertical-align:middle;font-size:15px;color:var(--text2);"></i> / <i class="ti ti-layout-sidebar-right-collapse" style="vertical-align:middle;font-size:15px;color:var(--text2);"></i> 버튼으로 패널 접기/펼치기 — 접힌 패널의 좁은 띠를 클릭하면 다시 펼쳐집니다</li>
+        </ul>
+      </div>
+
+      <!-- 2. 데이터베이스 -->
+      <div>
+        <div class="modal-section-title">2 · 제공되는 데이터베이스 (10개 테이블)</div>
+        <div class="guide-db-grid">
+          <div class="guide-db-item"><span class="guide-db-name">EMP</span><span class="guide-db-desc">사원 정보 (급여·부서·직무)</span><span class="guide-db-rows">20행</span></div>
+          <div class="guide-db-item"><span class="guide-db-name">DEPT</span><span class="guide-db-desc">부서 정보</span><span class="guide-db-rows">6행</span></div>
+          <div class="guide-db-item"><span class="guide-db-name">SALGRADE</span><span class="guide-db-desc">급여 등급 기준</span><span class="guide-db-rows">6행</span></div>
+          <div class="guide-db-item"><span class="guide-db-name">PRODUCTS</span><span class="guide-db-desc">상품 목록 (가전·가구·패션)</span><span class="guide-db-rows">15행</span></div>
+          <div class="guide-db-item"><span class="guide-db-name">ORDERS</span><span class="guide-db-desc">주문 내역</span><span class="guide-db-rows">30행</span></div>
+          <div class="guide-db-item"><span class="guide-db-name">STUDENTS</span><span class="guide-db-desc">학생 정보</span><span class="guide-db-rows">20행</span></div>
+          <div class="guide-db-item"><span class="guide-db-name">COURSES</span><span class="guide-db-desc">강의 목록</span><span class="guide-db-rows">15행</span></div>
+          <div class="guide-db-item"><span class="guide-db-name">ENROLL</span><span class="guide-db-desc">수강신청 + 성적</span><span class="guide-db-rows">53행</span></div>
+          <div class="guide-db-item"><span class="guide-db-name">MEMBERS</span><span class="guide-db-desc">회원 정보 (이메일·전화)</span><span class="guide-db-rows">20행</span></div>
+          <div class="guide-db-item"><span class="guide-db-name">ORG_CHART</span><span class="guide-db-desc">조직도 (계층 구조)</span><span class="guide-db-rows">18행</span></div>
+        </div>
+        <div class="guide-tip">💡 DML 예제 실행 후 데이터가 바뀌었다면 <strong>브라우저를 새로고침(F5)</strong>하면 DB가 원래 상태로 복구됩니다.</div>
+      </div>
+
+      <!-- 3. SQL 실행 -->
+      <div>
+        <div class="modal-section-title">3 · SQL 작성 및 실행</div>
+        <ul class="guide-list">
+          <li>에디터에 SQL 작성 후 <kbd>Ctrl</kbd>+<kbd>↵</kbd> 또는 우측 상단 <strong>실행</strong> 버튼 클릭</li>
+          <li>세미콜론(<code>;</code>)으로 구분하면 <strong>여러 구문을 한 번에 실행</strong> 가능</li>
+          <li>결과 컬럼 헤더 클릭 → 해당 컬럼 기준 <strong>오름/내림차순 정렬</strong></li>
+          <li>결과 우측 상단 <button class="btn-csv-inline" style="pointer-events:none;cursor:default;vertical-align:middle;display:inline-flex;"><i class="ti ti-copy"></i> CSV</button> 버튼으로 결과를 클립보드에 복사</li>
+          <li><strong>SQL 쿼리 탭</strong>: SELECT·DML 실행용 / <strong>DDL/DML 탭</strong>: CREATE·ALTER 등 구조 변경용</li>
+          <li>에디터 내용은 <strong>자동저장</strong> — 브라우저를 닫았다 열어도 마지막 내용 유지</li>
+        </ul>
+      </div>
+
+      <!-- 4. 예제 패널 -->
+      <div>
+        <div class="modal-section-title">4 · 예제 패널 100% 활용하기</div>
+        <ul class="guide-list">
+          <li>총 <strong>56개 예제</strong> / 16개 카테고리 (SELECT, JOIN, 서브쿼리, 윈도우 함수, DML, DDL 등)</li>
+          <li>상단 <strong>카테고리 탭</strong>으로 원하는 주제만 필터링</li>
+          <li>예제 카드 클릭 → 해당 SQL이 <strong>에디터에 자동 로드</strong></li>
+          <li><button class="ex-hint-btn" style="pointer-events:none;cursor:default;vertical-align:middle;">💡 힌트</button> : 풀이 방향 키워드 제공 (먼저 스스로 풀어보세요!)</li>
+          <li><button class="ex-sol-btn" style="pointer-events:none;cursor:default;vertical-align:middle;">📖 해설</button> : 문법 설명 + SQLD 시험 출제 포인트 안내</li>
+          <li><span class="ex-check" style="display:inline-flex;pointer-events:none;vertical-align:middle;margin-right:2px;"></span> 카드 우측 동그라미 클릭 → <strong>완료 체크</strong> (진행도 자동 저장)</li>
+          <li>진행도 전체 초기화는 우측 패널 상단 <button class="btn-progress-reset" style="pointer-events:none;cursor:default;vertical-align:middle;display:inline-flex;"><i class="ti ti-rotate-clockwise"></i> 초기화</button> 버튼</li>
+        </ul>
+      </div>
+
+      <!-- 5. 스키마 패널 -->
+      <div>
+        <div class="modal-section-title">5 · 스키마 패널 활용하기</div>
+        <ul class="guide-list">
+          <li><strong>테이블 이름 클릭</strong> → 에디터에 <code>SELECT * FROM 테이블명;</code> 자동 삽입</li>
+          <li>테이블 옆 <strong>▶</strong> 아이콘 클릭 → 컬럼 목록 펼치기/접기</li>
+          <li><strong>컬럼 이름 클릭</strong> → 현재 커서 위치에 컬럼명 삽입</li>
+          <li><span class="badge badge-pk">PK</span> 기본키 &nbsp;·&nbsp; <span class="badge badge-fk">FK</span> 외래키 — 어떤 컬럼으로 조인할지 바로 확인 가능</li>
+          <li>상단 <strong>검색창</strong>에서 테이블명·컬럼명으로 빠르게 필터링</li>
+        </ul>
+      </div>
+
+      <!-- 6. Oracle 자동 변환 -->
+      <div>
+        <div class="modal-section-title">6 · Oracle 문법 자동 변환</div>
+        <p style="font-size:13.5px;color:var(--text2);margin-bottom:10px;line-height:1.7;">이 환경은 SQLite 기반이지만 Oracle 문법을 <strong>그대로 입력해도 자동 변환</strong>됩니다. 변환된 항목은 결과창 상단에 표시됩니다.</p>
+        <div class="modal-diff-table" style="margin-bottom:10px;">
+          <div class="diff-row diff-header"><span>Oracle 입력</span><span>자동 변환 결과</span></div>
+          <div class="diff-row"><span>NVL(COMM, 0)</span><span>IFNULL(COMM, 0)</span></div>
+          <div class="diff-row"><span>SYSDATE</span><span>date('now')</span></div>
+          <div class="diff-row"><span>MOD(SAL, 1000)</span><span>(SAL % 1000)</span></div>
+          <div class="diff-row"><span>WHERE ROWNUM &lt;= 5</span><span>LIMIT 5</span></div>
+          <div class="diff-row"><span>MINUS</span><span>EXCEPT</span></div>
+          <div class="diff-row"><span>TO_CHAR(dt, 'YYYY')</span><span>STRFTIME('%Y', dt)</span></div>
+          <div class="diff-row"><span>ADD_MONTHS(dt, 3)</span><span>date(dt, '+3 month')</span></div>
+        </div>
+        <div class="guide-warning">⚠ <strong>자동 변환 불가 (SQLite 미지원)</strong>: CONNECT BY / START WITH · DECODE() · PIVOT / UNPIVOT · LISTAGG() · ROWID · DUAL<br><span style="font-size:13px;margin-top:4px;display:inline-block;">→ 우측 예제 패널 [계층형 질의], [PIVOT · Top N] 에서 대체 구문을 확인하세요.</span></div>
+      </div>
+
+      <!-- 7. 단축키 -->
+      <div>
+        <div class="modal-section-title">7 · 단축키 모음</div>
+        <div class="modal-shortcuts">
+          <div class="shortcut-row">
+            <div class="shortcut-keys"><kbd>Ctrl</kbd>+<kbd>↵</kbd></div>
+            <span class="shortcut-desc">쿼리 실행</span>
+          </div>
+          <div class="shortcut-row">
+            <div class="shortcut-keys"><kbd>Ctrl</kbd>+<kbd>/</kbd></div>
+            <span class="shortcut-desc">현재 줄 주석 토글</span>
+          </div>
+          <div class="shortcut-row">
+            <div class="shortcut-keys"><kbd>Ctrl</kbd>+<kbd>Z</kbd></div>
+            <span class="shortcut-desc">실행 취소</span>
+          </div>
+          <div class="shortcut-row">
+            <div class="shortcut-keys"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd></div>
+            <span class="shortcut-desc">다시 실행</span>
+          </div>
+          <div class="shortcut-row">
+            <div class="shortcut-keys"><kbd>Esc</kbd></div>
+            <span class="shortcut-desc">모달 닫기</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 8. 주의사항 -->
+      <div>
+        <div class="modal-section-title">8 · 자주 하는 실수 &amp; 주의사항</div>
+        <ul class="guide-list">
+          <li><code>WHERE</code> 없이 <code>UPDATE</code> / <code>DELETE</code> 실행 시 <strong>전체 행이 변경</strong>됩니다 — 실수했다면 <strong>브라우저를 새로고침(F5)</strong>하면 DB가 원래 상태로 복구됩니다</li>
+          <li><code>GROUP BY</code>에 없는 컬럼을 <code>SELECT</code>에 단독으로 쓰면 <strong>오류 발생</strong></li>
+          <li><code>AVG()</code> · <code>COUNT(컬럼)</code>은 NULL 행 <strong>자동 제외</strong> — <code>COUNT(*)</code>와 결과가 다를 수 있음</li>
+          <li>Oracle의 날짜 직접 비교는 SQLite에서 <strong>문자열 비교</strong>로 동작 — 날짜 형식을 통일해서 작성 필요</li>
+          <li>브라우저 탭을 닫아도 진행도와 에디터 내용은 <strong>자동 저장</strong>됨 (같은 브라우저 기준)</li>
+        </ul>
+      </div>
+
+    </div>
+    <div class="modal-ft" style="justify-content:flex-end;">
+      <button class="btn-modal-start" id="btn-guide-close">닫기</button>
+    </div>
+  </div>
+</div>
+
+<style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+
+<!-- SQL.js 엔진 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/sql-wasm.js"></script>
+
+<script type="module">
+import {EditorView, basicSetup} from "https://esm.sh/codemirror@6.0.1";
+import {sql as sqlLang} from "https://esm.sh/@codemirror/lang-sql@6.4.1";
+
+/* ════════════════════════════════════════════════════════
+   DATA
+════════════════════════════════════════════════════════ */
+const SCHEMA = [
+  {name:'EMP',rows:20,cols:[{n:'EMPNO',t:'INTEGER',pk:true},{n:'ENAME',t:'TEXT'},{n:'JOB',t:'TEXT'},{n:'MGR',t:'INTEGER'},{n:'HIREDATE',t:'TEXT'},{n:'SAL',t:'REAL'},{n:'COMM',t:'REAL'},{n:'DEPTNO',t:'INTEGER',fk:'DEPT'}]},
+  {name:'DEPT',rows:6,cols:[{n:'DEPTNO',t:'INTEGER',pk:true},{n:'DNAME',t:'TEXT'},{n:'LOC',t:'TEXT'}]},
+  {name:'SALGRADE',rows:6,cols:[{n:'GRADE',t:'INTEGER',pk:true},{n:'LOSAL',t:'REAL'},{n:'HISAL',t:'REAL'}]},
+  {name:'PRODUCTS',rows:15,cols:[{n:'PROD_ID',t:'TEXT',pk:true},{n:'PROD_NAME',t:'TEXT'},{n:'CATEGORY',t:'TEXT'},{n:'PRICE',t:'REAL'},{n:'DISC_RATE',t:'REAL'}]},
+  {name:'ORDERS',rows:30,cols:[{n:'ORDER_ID',t:'TEXT',pk:true},{n:'CUST_ID',t:'TEXT'},{n:'ORDER_DATE',t:'TEXT'},{n:'PROD_ID',t:'TEXT',fk:'PRODUCTS'},{n:'QTY',t:'INTEGER'},{n:'AMOUNT',t:'REAL'}]},
+  {name:'ORG_CHART',rows:18,cols:[{n:'ID',t:'INTEGER',pk:true},{n:'NAME',t:'TEXT'},{n:'PID',t:'INTEGER',fk:'ORG_CHART'},{n:'POS',t:'TEXT'}]},
+  {name:'STUDENTS',rows:20,cols:[{n:'STU_ID',t:'TEXT',pk:true},{n:'NAME',t:'TEXT'},{n:'MAJOR',t:'TEXT'},{n:'YEAR',t:'INTEGER'},{n:'TEL',t:'TEXT'}]},
+  {name:'COURSES',rows:15,cols:[{n:'SUB_ID',t:'TEXT',pk:true},{n:'SUB_NAME',t:'TEXT'},{n:'CREDIT',t:'INTEGER'},{n:'PROFESSOR',t:'TEXT'}]},
+  {name:'ENROLL',rows:53,cols:[{n:'STU_ID',t:'TEXT',pk:true,fk:'STUDENTS'},{n:'SUB_ID',t:'TEXT',pk:true,fk:'COURSES'},{n:'SCORE',t:'INTEGER'},{n:'GRADE',t:'TEXT'}]},
+  {name:'MEMBERS',rows:20,cols:[{n:'MEM_ID',t:'TEXT',pk:true},{n:'EMAIL',t:'TEXT'},{n:'PHONE',t:'TEXT'},{n:'JOIN_DATE',t:'TEXT'}]},
+];
+
+const INIT_SQL = `
+CREATE TABLE DEPT(DEPTNO INTEGER PRIMARY KEY,DNAME TEXT NOT NULL,LOC TEXT);
+INSERT INTO DEPT VALUES(10,'ACCOUNTING','NEW YORK'),(20,'RESEARCH','DALLAS'),(30,'SALES','CHICAGO'),(40,'OPERATIONS','BOSTON'),(50,'MARKETING','SEOUL'),(60,'PLANNING','TOKYO');
+CREATE TABLE EMP(EMPNO INTEGER PRIMARY KEY,ENAME TEXT NOT NULL,JOB TEXT,MGR INTEGER,HIREDATE TEXT,SAL REAL,COMM REAL,DEPTNO INTEGER);
+INSERT INTO EMP VALUES(7369,'SMITH','CLERK',7902,'1980-12-17',800,NULL,20),(7499,'ALLEN','SALESMAN',7698,'1981-02-20',1600,300,30),(7521,'WARD','SALESMAN',7698,'1981-02-22',1250,500,30),(7566,'JONES','MANAGER',7839,'1981-04-02',2975,NULL,20),(7654,'MARTIN','SALESMAN',7698,'1981-09-28',1250,1400,30),(7698,'BLAKE','MANAGER',7839,'1981-05-01',2850,NULL,30),(7782,'CLARK','MANAGER',7839,'1981-06-09',2450,NULL,10),(7788,'SCOTT','ANALYST',7566,'1987-04-19',3000,NULL,20),(7839,'KING','PRESIDENT',NULL,'1981-11-17',5000,NULL,10),(7844,'TURNER','SALESMAN',7698,'1981-09-08',1500,0,30),(7876,'ADAMS','CLERK',7788,'1987-05-23',1100,NULL,20),(7900,'JAMES','CLERK',7698,'1981-12-03',950,NULL,30),(7902,'FORD','ANALYST',7566,'1981-12-03',3000,NULL,20),(7934,'MILLER','CLERK',7782,'1982-01-23',1300,NULL,10),(8001,'LEE','ANALYST',7566,'2024-01-10',3200,NULL,20),(8002,'PARK','SALESMAN',7698,'2024-02-15',1400,400,30),(8003,'CHOI','CLERK',7782,'2024-03-20',1100,NULL,10),(8004,'JUNG','MANAGER',7839,'2024-04-01',2900,NULL,NULL),(8005,'KANG','CLERK',8004,'2024-05-12',900,NULL,NULL),(8006,'JO','ANALYST',7566,'2024-06-01',3500,NULL,40);
+CREATE TABLE SALGRADE(GRADE INTEGER PRIMARY KEY,LOSAL REAL,HISAL REAL);
+INSERT INTO SALGRADE VALUES(1,0,1200),(2,1200.01,1400),(3,1400.01,2000),(4,2000.01,3000),(5,3000.01,5000),(6,5000.01,99999);
+CREATE TABLE PRODUCTS(PROD_ID TEXT PRIMARY KEY,PROD_NAME TEXT NOT NULL,CATEGORY TEXT,PRICE REAL,DISC_RATE REAL);
+INSERT INTO PRODUCTS VALUES('P001','삼성 갤럭시 S24','가전',1150000,0.05),('P002','LG 휘센 에어컨','가전',2300000,0.1),('P003','애플 맥북 에어 M3','가전',1590000,NULL),('P004','다이슨 V15 청소기','가전',890000,0.15),('P005','소니 노이즈캔슬링 헤드폰','가전',450000,NULL),('P006','시디즈 T50 의자','가구',350000,0.08),('P007','데스커 모션데스크','가구',600000,0.12),('P008','이케아 빌리 책장','가구',99000,NULL),('P009','일룸 쿠시노 침대','가구',1200000,0.05),('P010','모나미 볼펜 153 세트','문구',15000,NULL),('P011','라미 사파리 만년필','문구',55000,0.2),('P012','3M 포스트잇 대용량','문구',12000,NULL),('P013','나이키 에어포스 1','패션',139000,NULL),('P014','아디다스 슈퍼스타','패션',110000,0.1),('P015','파타고니아 레트로X','패션',280000,0.05);
+CREATE TABLE ORDERS(ORDER_ID TEXT PRIMARY KEY,CUST_ID TEXT,ORDER_DATE TEXT,PROD_ID TEXT,QTY INTEGER,AMOUNT REAL);
+INSERT INTO ORDERS VALUES('ORD_001','CUST_01','2024-01-02','P001',1,1150000),('ORD_002','CUST_02','2024-01-03','P003',1,1590000),('ORD_003','CUST_03','2024-01-05','P005',2,900000),('ORD_004','CUST_01','2024-01-10','P002',1,2300000),('ORD_005','CUST_04','2024-01-12','P001',1,1150000),('ORD_006','CUST_05','2024-01-15','P010',10,150000),('ORD_007','CUST_02','2024-01-18','P007',1,600000),('ORD_008','CUST_06','2024-01-20','P013',1,139000),('ORD_009','CUST_03','2024-01-25','P014',1,110000),('ORD_010','CUST_07','2024-01-30','P015',2,560000),('ORD_011','CUST_01','2024-02-01','P003',1,1590000),('ORD_012','CUST_08','2024-02-05','P012',5,60000),('ORD_013','CUST_04','2024-02-08','P001',1,1150000),('ORD_014','CUST_02','2024-02-10','P006',1,350000),('ORD_015','CUST_09','2024-02-12','P009',1,1200000),('ORD_016','CUST_05','2024-02-15','P011',2,110000),('ORD_017','CUST_10','2024-02-18','P014',1,110000),('ORD_018','CUST_01','2024-02-20','P004',1,890000),('ORD_019','CUST_03','2024-02-25','P007',1,600000),('ORD_020','CUST_06','2024-02-28','P013',2,278000),('ORD_021','CUST_02','2024-03-01','P001',1,1150000),('ORD_022','CUST_04','2024-03-05','P005',3,1350000),('ORD_023','CUST_07','2024-03-10','P015',1,280000),('ORD_024','CUST_01','2024-03-12','P010',20,300000),('ORD_025','CUST_08','2024-03-15','P012',10,120000),('ORD_026','CUST_05','2024-03-18','P011',1,55000),('ORD_027','CUST_09','2024-03-20','P002',1,2300000),('ORD_028','CUST_02','2024-03-25','P003',2,3180000),('ORD_029','CUST_10','2024-03-28','P006',1,350000),('ORD_030','CUST_03','2024-03-30','P004',1,890000);
+CREATE TABLE ORG_CHART(ID INTEGER PRIMARY KEY,NAME TEXT NOT NULL,PID INTEGER,POS TEXT);
+INSERT INTO ORG_CHART VALUES(1,'홍길동',NULL,'대표이사'),(2,'이순신',1,'영업전무'),(3,'강감찬',1,'기술전무'),(4,'유관순',2,'영업1팀장'),(5,'안중근',2,'영업2팀장'),(6,'윤봉길',3,'개발1팀장'),(7,'김좌진',3,'개발2팀장'),(8,'김구',4,'영업1팀과장'),(9,'신익희',5,'영업2팀과장'),(10,'조소앙',6,'개발1팀과장'),(11,'지청천',7,'개발2팀과장'),(12,'홍범도',8,'영업1팀대리'),(13,'이범석',9,'영업2팀대리'),(14,'김원봉',10,'개발1팀대리'),(15,'나석주',12,'영업1팀사원'),(16,'김마리아',13,'영업2팀사원'),(17,'유림',14,'개발1팀사원'),(18,'박열',11,'개발2팀사원');
+CREATE TABLE STUDENTS(STU_ID TEXT PRIMARY KEY,NAME TEXT,MAJOR TEXT,YEAR INTEGER,TEL TEXT);
+INSERT INTO STUDENTS VALUES('S2021001','강하늘','컴퓨터공학',4,'010-1111-0001'),('S2021002','박보검','경영학',4,'010-1111-0002'),('S2021003','김지원','데이터과학',4,'010-1111-0003'),('S2022001','남주혁','컴퓨터공학',3,'010-1111-0004'),('S2022002','수지','산업디자인',3,'010-1111-0005'),('S2022003','임윤아','경영학',3,'010-1111-0006'),('S2023001','송중기','데이터과학',2,'010-1111-0007'),('S2023002','한소희','컴퓨터공학',2,'010-1111-0008'),('S2023003','정해인','산업디자인',2,'010-1111-0009'),('S2023004','신세경','경영학',2,'010-1111-0010'),('S2024001','이도현','컴퓨터공학',1,'010-1111-0011'),('S2024002','고민시','데이터과학',1,'010-1111-0012'),('S2024003','구교환','산업디자인',1,'010-1111-0013'),('S2024004','김태리','컴퓨터공학',1,'010-1111-0014'),('S2024005','공유','경영학',1,'010-1111-0015'),('S2024006','손예진','데이터과학',1,'010-1111-0016'),('S2024007','현빈','산업디자인',1,'010-1111-0017'),('S2024008','박은빈','컴퓨터공학',1,'010-1111-0018'),('S2024009','조우진','경영학',1,'010-1111-0019'),('S2024010','김혜수','데이터과학',1,'010-1111-0020');
+CREATE TABLE COURSES(SUB_ID TEXT PRIMARY KEY,SUB_NAME TEXT,CREDIT INTEGER,PROFESSOR TEXT);
+INSERT INTO COURSES VALUES('C001','데이터베이스 개론',3,'김데이터'),('C002','SQL 실무 및 활용',3,'이쿼리'),('C003','자료구조',3,'박구조'),('C004','운영체제',3,'최시스템'),('C005','경영학원론',3,'정경영'),('C006','마케팅원론',3,'강마켓'),('C007','재무관리',3,'윤재무'),('C008','빅데이터 분석 기초',3,'조빅데'),('C009','파이썬 프로그래밍',2,'임파이'),('C010','머신러닝 입문',3,'한머신'),('C011','인공지능 개론',3,'오지능'),('C012','디자인 씽킹',2,'서디자인'),('C013','UX/UI 디자인 실무',3,'권유엑스'),('C014','시각 디자인 기초',3,'황시각'),('C015','교양: 논리와 사고',2,'안논리');
+CREATE TABLE ENROLL(STU_ID TEXT,SUB_ID TEXT,SCORE INTEGER,GRADE TEXT,PRIMARY KEY(STU_ID,SUB_ID));
+INSERT INTO ENROLL VALUES('S2021001','C001',95,'A+'),('S2021001','C002',92,'A0'),('S2021001','C003',85,'B+'),('S2021002','C005',88,'B+'),('S2021002','C006',90,'A0'),('S2021002','C007',82,'B0'),('S2021003','C008',91,'A0'),('S2021003','C010',96,'A+'),('S2021003','C011',88,'B+'),('S2022001','C001',80,'B0'),('S2022001','C002',85,'B+'),('S2022001','C009',100,'A+'),('S2022002','C012',95,'A+'),('S2022002','C013',91,'A0'),('S2022002','C015',88,'B+'),('S2022003','C005',76,'C+'),('S2022003','C006',82,'B0'),('S2022003','C007',90,'A0'),('S2023001','C008',88,'B+'),('S2023001','C009',95,'A+'),('S2023001','C010',78,'C+'),('S2023002','C001',92,'A0'),('S2023002','C003',90,'A0'),('S2023002','C004',85,'B+'),('S2023003','C012',85,'B+'),('S2023003','C014',92,'A0'),('S2023004','C005',91,'A0'),('S2023004','C006',88,'B+'),('S2023004','C007',72,'C0'),('S2024001','C001',78,'C+'),('S2024001','C009',86,'B+'),('S2024001','C015',92,'A0'),('S2024002','C008',82,'B0'),('S2024002','C010',80,'B0'),('S2024002','C015',85,'B+'),('S2024003','C012',90,'A0'),('S2024003','C014',88,'B+'),('S2024003','C015',80,'B0'),('S2024004','C001',100,'A+'),('S2024004','C009',98,'A+'),('S2024004','C015',95,'A+'),('S2024005','C005',86,'B+'),('S2024005','C015',88,'B+'),('S2024006','C008',75,'C+'),('S2024006','C015',82,'B0'),('S2024007','C012',88,'B+'),('S2024007','C015',91,'A0'),('S2024008','C001',90,'A0'),('S2024008','C015',85,'B+'),('S2024009','C005',78,'C+'),('S2024009','C015',82,'B0'),('S2024010','C008',96,'A+'),('S2024010','C015',90,'A0');
+CREATE TABLE MEMBERS(MEM_ID TEXT PRIMARY KEY,EMAIL TEXT,PHONE TEXT,JOIN_DATE TEXT);
+INSERT INTO MEMBERS VALUES('M1001','user01@gmail.com','010-1234-5678','2023-01-15'),('M1002','lee_naver.com','1011112222','2023-02-19'),('M1003','admin@sqld.kr','02-123-4567','2023-03-04'),('M1004',NULL,'010-9999-8888','2023-04-09'),('M1005','kang@daum.net',NULL,'2023-05-11'),('M1006','test.user@company.co.kr','010 5555 6666','2023-06-17'),('M1007','invalid-email','011-222-3333','2023-07-21'),('M1008','user8@gmail.com','010-888-9999','2023-07-31'),('M1009','user9@kakao.com','-6840','2023-09-10'),('M1010','DATA_expert@sql.org','010-7777-7777','2023-10-04'),('M1011','park123@gmail.com','010-1234-567','2023-11-19'),('M1012','@missingid.com','010-4321-8765','2023-12-14'),('M1013','choi@workspace.net','02)555-1234','2024-01-09'),('M1014','sqld2024@exam.com','010-0000-0000','2024-02-04'),('M1015','blank_phone@test.com',NULL,'2024-02-29'),('M1016','double@@at.com','010-2222-3333','2024-04-11'),('M1017','good_user@gmail.com','051-123-4567','2024-05-19'),('M1018','user18@yahoo.com','010.4444.5555','2024-06-14'),('M1019','spacing user@gmail.com','010-5555-7777','2024-07-06'),('M1020','final_user@daum.net','010-8888-8888','2024-08-07');
+`;
+
+const EXAMPLES = [
+  {g:'SELECT',items:[
+    {t:'전체 조회',d:'모든 컬럼 조회 (*)',sql:`SELECT * FROM EMP;`,
+     hint:`* 와일드카드로 모든 컬럼을 가져올 수 있어요. 조회할 테이블명만 기억하세요.`,
+     solution:`SELECT * FROM 테이블명; — 가장 기본적인 조회 구문입니다. *은 모든 컬럼을 의미하며, 실무에서는 필요한 컬럼만 명시하는 것이 성능에 좋습니다.`},
+    {t:'특정 컬럼 / 별칭',d:'AS 키워드로 컬럼 별칭 지정',sql:`SELECT NAME AS 학생명, MAJOR AS 학과 FROM STUDENTS;`,
+     hint:`SELECT 컬럼명 AS 별칭 — AS 키워드 뒤에 원하는 이름을 씁니다. AS는 생략 가능합니다.`,
+     solution:`SELECT 컬럼1 AS 별칭1, 컬럼2 AS 별칭2 FROM 테이블명; — AS는 생략 가능하지만 명시하면 가독성이 좋습니다. 한글 별칭도 사용 가능합니다.`},
+    {t:'ORDER BY 다중 정렬',d:'부서 오름차순, 급여 내림차순',sql:`SELECT DEPTNO, ENAME, SAL\nFROM EMP\nORDER BY DEPTNO ASC, SAL DESC;`,
+     hint:`ORDER BY 컬럼1 ASC, 컬럼2 DESC — 첫 번째 기준으로 먼저 정렬하고, 같은 값이면 두 번째 기준으로 정렬합니다.`,
+     solution:`ORDER BY에 여러 컬럼을 쉼표로 나열합니다. ASC(기본값·오름차순), DESC(내림차순). DEPTNO로 먼저 묶고, 같은 부서 내에서 SAL 높은 순으로 정렬하는 패턴입니다.`},
+    {t:'합성 연산자 (||)',d:'문자열 결합 — Oracle CONCAT 대체',sql:`SELECT ENAME || ' is a ' || JOB AS INTRO FROM EMP;`,
+     hint:`문자열 결합은 Oracle/SQLite에서 || 연산자를 사용합니다. MySQL은 CONCAT()을 씁니다.`,
+     solution:`ENAME || ' is a ' || JOB — 두 컬럼 사이에 고정 문자열을 넣어 새 문자열을 만드는 패턴입니다. Oracle SQLD 시험에서 자주 출제됩니다.`},
+  ]},
+  {g:'집계 함수',items:[
+    {t:'그룹별 평균',d:'ROUND + AVG + GROUP BY',sql:`SELECT DEPTNO, ROUND(AVG(SAL), 0) AS AVG_SAL\nFROM EMP\nGROUP BY DEPTNO;`,
+     hint:`GROUP BY 그룹컬럼 — 같은 값끼리 묶어서 AVG, SUM, COUNT 등 집계 함수를 적용합니다.`,
+     solution:`GROUP BY 뒤에 나오는 컬럼은 SELECT에 집계 함수 없이 그대로 쓸 수 있습니다. ROUND(값, 소수자릿수)로 반올림합니다. GROUP BY에 없는 컬럼을 SELECT에 단독으로 쓰면 오류가 발생합니다.`},
+    {t:'HAVING 조건',d:'그룹 결과 필터링',sql:`SELECT SUB_ID, AVG(SCORE) AS AVG_SCORE\nFROM ENROLL\nGROUP BY SUB_ID\nHAVING AVG(SCORE) >= 90;`,
+     hint:`WHERE는 개별 행을 필터링, HAVING은 GROUP BY 결과(집계 후)를 필터링합니다.`,
+     solution:`GROUP BY 후 그룹 결과에 조건을 걸 때 HAVING을 사용합니다. HAVING AVG(SCORE) >= 90처럼 집계 함수를 직접 비교할 수 있습니다. WHERE절에서는 집계 함수 사용 불가!`},
+  ]},
+  {g:'단일행 함수',items:[
+    {t:'NULL 처리 (IFNULL)',d:'커미션 NULL → 0 / Oracle NVL 대체',sql:`SELECT ENAME, SAL, COMM,\n       SAL + IFNULL(COMM, 0) AS TOTAL_SAL\nFROM EMP;`,
+     hint:`IFNULL(컬럼, 대체값) — NULL이면 대체값 반환. Oracle의 NVL()과 동일합니다.`,
+     solution:`SAL + IFNULL(COMM, 0) — COMM이 NULL인 경우 그냥 더하면 결과가 NULL이 되므로 IFNULL로 0으로 치환 후 계산합니다. Oracle에서는 NVL(COMM, 0)으로 씁니다.`},
+    {t:'문자열 (SUBSTR · INSTR)',d:'이메일 @ 앞부분 추출',sql:`SELECT EMAIL,\n       SUBSTR(EMAIL, 1, INSTR(EMAIL,'@')-1) AS ID_PART\nFROM MEMBERS\nWHERE EMAIL IS NOT NULL AND EMAIL LIKE '%@%';`,
+     hint:`INSTR(문자열, 검색문자)는 검색 문자의 위치(1-based)를 반환합니다. SUBSTR(문자열, 시작, 길이)로 잘라냅니다.`,
+     solution:`SUBSTR(EMAIL, 1, INSTR(EMAIL,'@')-1) — INSTR로 @의 위치를 찾고, -1 해서 @ 앞까지만 추출합니다. Oracle에서도 동일 함수명(SUBSTR, INSTR)을 사용합니다.`},
+    {t:'숫자 함수 (FLOOR · CEIL · MOD)',d:'급여 올림/내림/나머지',sql:`SELECT ENAME, SAL,\n       FLOOR(SAL/1000)*1000 AS FLOOR_SAL,\n       CEIL(SAL/1000)*1000  AS CEIL_SAL,\n       SAL % 1000           AS MOD_SAL\nFROM EMP;`,
+     hint:`FLOOR(내림), CEIL(올림), SAL % 1000(나머지) — Oracle에서는 MOD(SAL, 1000)을 사용합니다.`,
+     solution:`FLOOR(SAL/1000)*1000은 천 단위 내림, CEIL(SAL/1000)*1000은 올림입니다. SQLite는 % 연산자로 나머지를 구하며, Oracle에서는 MOD() 함수를 씁니다.`},
+    {t:'날짜 함수 (julianday)',d:'주문일 ~ 오늘 경과 일수',sql:`SELECT ORDER_ID, ORDER_DATE,\n       CAST(julianday(date('now')) - julianday(ORDER_DATE) AS INTEGER) AS DAYS_PASSED\nFROM ORDERS\nORDER BY DAYS_PASSED DESC LIMIT 5;`,
+     hint:`SQLite는 julianday()로 날짜를 Julian 일수로 변환 후 뺄셈합니다. Oracle에서는 날짜 - 날짜 직접 계산이 가능합니다.`,
+     solution:`julianday(date('now')) - julianday(ORDER_DATE)로 경과 일수를 구합니다. CAST(... AS INTEGER)로 소수점 제거. Oracle에서는 SYSDATE - TO_DATE('날짜','YYYY-MM-DD') 방식입니다.`},
+    {t:'변환 함수 (STRFTIME · CAST)',d:'날짜 포맷 변환 — Oracle TO_CHAR 대체',sql:`SELECT ORDER_ID,\n       STRFTIME('%Y', ORDER_DATE) AS YEAR,\n       STRFTIME('%m', ORDER_DATE) AS MONTH,\n       CAST(AMOUNT AS TEXT) || '원' AS AMOUNT_STR\nFROM ORDERS LIMIT 5;`,
+     hint:`STRFTIME('%Y', 날짜)로 연도 추출. Oracle의 TO_CHAR(날짜, 'YYYY') 대응 함수입니다.`,
+     solution:`STRFTIME 포맷: %Y(4자리연도), %m(2자리월), %d(2자리일). CAST(값 AS TEXT)로 숫자→문자 변환. Oracle에서는 TO_CHAR(), TO_NUMBER(), TO_DATE() 3종 변환 함수가 핵심입니다.`},
+    {t:'NULL 함수 (NULLIF · COALESCE)',d:'0이면 NULL / NULL이면 -1',sql:`SELECT ENAME, COMM,\n       NULLIF(COMM, 0)    AS COMM_NULLIF,\n       COALESCE(COMM, -1) AS COMM_COALESCE\nFROM EMP;`,
+     hint:`NULLIF(A, B) — A=B이면 NULL 반환, 다르면 A 반환. COALESCE(A, B, ...) — 첫 번째 non-NULL 값 반환.`,
+     solution:`NULLIF(COMM, 0)은 COMM이 0이면 NULL, COALESCE(COMM, -1)은 COMM이 NULL이면 -1로 치환합니다. COALESCE는 여러 인수 중 첫 NULL이 아닌 값을 반환하므로 Oracle NVL보다 유연합니다.`},
+  ]},
+  {g:'JOIN',items:[
+    {t:'INNER JOIN',d:'사원 ↔ 부서 등가 조인',sql:`SELECT E.ENAME, E.SAL, D.DNAME, D.LOC\nFROM EMP E\nJOIN DEPT D ON E.DEPTNO = D.DEPTNO;`,
+     hint:`JOIN(=INNER JOIN) — ON 조건이 일치하는 행만 결합합니다. 두 테이블 모두에 존재하는 행만 결과에 포함됩니다.`,
+     solution:`FROM EMP E JOIN DEPT D ON E.DEPTNO = D.DEPTNO — 테이블 별칭(E, D)으로 컬럼을 구분합니다. 부서가 없는(DEPTNO=NULL) 사원은 결과에서 제외됩니다.`},
+    {t:'LEFT OUTER JOIN',d:'사원 없는 부서도 포함',sql:`SELECT D.DNAME, E.ENAME, E.SAL\nFROM DEPT D\nLEFT OUTER JOIN EMP E ON D.DEPTNO = E.DEPTNO;`,
+     hint:`LEFT JOIN — 왼쪽 테이블의 모든 행을 보존하고, 오른쪽에 일치하는 행이 없으면 NULL로 채웁니다.`,
+     solution:`FROM DEPT D LEFT JOIN EMP E — DEPT가 왼쪽이므로 사원 없는 부서(40, 50, 60번 등)도 결과에 포함됩니다. 오른쪽(EMP) 컬럼은 NULL로 표시됩니다.`},
+    {t:'비등가 조인 (BETWEEN)',d:'급여 등급 조회 — 범위 조건',sql:`SELECT E.ENAME, E.SAL, S.GRADE\nFROM EMP E\nJOIN SALGRADE S ON E.SAL BETWEEN S.LOSAL AND S.HISAL\nORDER BY S.GRADE, E.SAL;`,
+     hint:`등가 조인(=)이 아닌 BETWEEN, >, < 등의 조건으로 조인할 수 있습니다.`,
+     solution:`ON E.SAL BETWEEN S.LOSAL AND S.HISAL — SAL이 LOSAL~HISAL 범위에 속하는 SALGRADE 행과 매칭됩니다. 비등가 조인은 범위나 비교 조건을 ON절에 사용하는 방식입니다.`},
+    {t:'3개 테이블 조인',d:'학생 · 수강신청 · 과목 3중 JOIN',sql:`SELECT S.NAME, C.SUB_NAME, E.SCORE, E.GRADE\nFROM STUDENTS S\nJOIN ENROLL E  ON S.STU_ID = E.STU_ID\nJOIN COURSES C ON E.SUB_ID = C.SUB_ID\nORDER BY E.SCORE DESC;`,
+     hint:`여러 테이블을 JOIN할 때는 JOIN을 연속으로 씁니다. 중간 연결 테이블(ENROLL)이 키 역할을 합니다.`,
+     solution:`STUDENTS→ENROLL→COURSES 순으로 JOIN. STU_ID는 STUDENTS↔ENROLL을, SUB_ID는 ENROLL↔COURSES를 연결합니다. 교차 테이블(bridge table)을 활용한 다대다 관계 해소 패턴입니다.`},
+    {t:'CROSS JOIN (카테시안 곱)',d:'부서 × 급여등급 모든 조합',sql:`SELECT D.DNAME, S.GRADE, S.LOSAL, S.HISAL\nFROM DEPT D\nCROSS JOIN SALGRADE S\nORDER BY D.DEPTNO, S.GRADE;`,
+     hint:`CROSS JOIN은 ON 조건 없이 두 테이블의 모든 행 조합을 만듭니다. 결과 행 수 = A 행수 × B 행수.`,
+     solution:`FROM DEPT CROSS JOIN SALGRADE — 6개 부서 × 6개 급여등급 = 36행이 생성됩니다. WHERE절 없이 사용하면 카테시안 곱이 발생하므로 의도적인 경우에만 사용합니다.`},
+    {t:'SELF JOIN',d:'사원 ↔ 상사 — 같은 테이블 2번',sql:`SELECT E.ENAME AS 사원명, E.JOB AS 직무,\n       M.ENAME AS 상사명, M.JOB AS 상사직무\nFROM EMP E\nLEFT JOIN EMP M ON E.MGR = M.EMPNO\nORDER BY M.ENAME NULLS LAST, E.ENAME;`,
+     hint:`같은 테이블을 두 번 쓸 때는 서로 다른 별칭(E, M)을 부여합니다. 계층 관계나 비교 용도에 활용됩니다.`,
+     solution:`FROM EMP E LEFT JOIN EMP M ON E.MGR = M.EMPNO — E는 직원, M은 같은 EMP에서 상사 역할. LEFT JOIN이므로 상사가 없는 KING도 결과에 포함됩니다.`},
+    {t:'RIGHT JOIN 대체',d:'SQLite 미지원 → LEFT JOIN 순서 변경',sql:`SELECT D.DEPTNO, D.DNAME, COUNT(E.EMPNO) AS EMP_CNT\nFROM DEPT D\nLEFT JOIN EMP E ON D.DEPTNO = E.DEPTNO\nGROUP BY D.DEPTNO, D.DNAME\nORDER BY D.DEPTNO;`,
+     hint:`SQLite는 RIGHT JOIN을 지원하지 않습니다. 테이블 순서를 바꿔 LEFT JOIN으로 대체하세요.`,
+     solution:`DEPT LEFT JOIN EMP는 DEPT를 기준으로 모든 부서를 보존합니다. EMP RIGHT JOIN DEPT와 결과가 동일합니다. 테이블 순서만 바꾸면 됩니다.`},
+  ]},
+  {g:'서브쿼리',items:[
+    {t:'단일행 서브쿼리',d:'JONES보다 급여 높은 사원',sql:`SELECT ENAME, SAL FROM EMP\nWHERE SAL > (SELECT SAL FROM EMP WHERE ENAME = 'JONES');`,
+     hint:`서브쿼리가 값 하나를 반환할 때 =, >, < 등의 비교 연산자를 사용합니다.`,
+     solution:`WHERE SAL > (SELECT SAL FROM EMP WHERE ENAME='JONES') — 괄호 안 서브쿼리가 먼저 실행되어 JONES의 급여(2975)를 반환합니다. 메인 쿼리는 그 값보다 급여가 높은 사원을 조회합니다.`},
+    {t:'다중행 서브쿼리 (IN)',d:'SALES 부서 소속 사원',sql:`SELECT ENAME, DEPTNO FROM EMP\nWHERE DEPTNO IN (\n  SELECT DEPTNO FROM DEPT WHERE DNAME = 'SALES'\n);`,
+     hint:`서브쿼리가 여러 행을 반환할 때는 IN, ANY, ALL을 사용합니다. = 연산자는 단일 값만 비교 가능합니다.`,
+     solution:`WHERE DEPTNO IN (SELECT DEPTNO FROM DEPT WHERE DNAME='SALES') — 서브쿼리가 DEPTNO 목록(30번)을 반환하고, IN은 그 목록에 해당하는 행을 필터링합니다.`},
+    {t:'스칼라 서브쿼리',d:'SELECT절에서 부서명 조회',sql:`SELECT ENAME,\n       (SELECT DNAME FROM DEPT D WHERE D.DEPTNO = E.DEPTNO) AS DNAME\nFROM EMP E;`,
+     hint:`SELECT절에 서브쿼리를 쓸 수 있습니다. 각 행마다 한 번씩 실행되어 값 하나를 반환해야 합니다.`,
+     solution:`(SELECT DNAME FROM DEPT D WHERE D.DEPTNO = E.DEPTNO) — 외부 쿼리(E) 각 행에 대해 DEPT에서 DNAME을 가져옵니다. JOIN 없이 원하는 컬럼만 추가할 때 유용하지만, 행이 많으면 성능에 불리합니다.`},
+    {t:'인라인뷰 (FROM절)',d:'부서별 평균급여 2000 이상',sql:`SELECT D.DNAME, T.AVG_SAL, T.EMP_CNT\nFROM (\n  SELECT DEPTNO, ROUND(AVG(SAL),0) AS AVG_SAL, COUNT(*) AS EMP_CNT\n  FROM EMP GROUP BY DEPTNO\n) T\nJOIN DEPT D ON T.DEPTNO = D.DEPTNO\nWHERE T.AVG_SAL >= 2000 ORDER BY T.AVG_SAL DESC;`,
+     hint:`FROM절의 서브쿼리를 인라인 뷰라고 합니다. 임시 테이블처럼 사용할 수 있으며 반드시 별칭이 필요합니다.`,
+     solution:`FROM (SELECT ... GROUP BY DEPTNO) T — 서브쿼리 결과에 별칭 T를 붙여 테이블처럼 활용합니다. 집계 후 JOIN이 필요한 경우에 자주 사용되는 패턴입니다.`},
+    {t:'EXISTS (존재 여부)',d:'주문 있는 상품만 조회',sql:`SELECT P.PROD_ID, P.PROD_NAME, P.CATEGORY, P.PRICE\nFROM PRODUCTS P\nWHERE EXISTS (\n  SELECT 1 FROM ORDERS O WHERE O.PROD_ID = P.PROD_ID\n)\nORDER BY P.CATEGORY, P.PRICE DESC;`,
+     hint:`EXISTS(서브쿼리) — 서브쿼리에 결과가 존재하면 TRUE. IN보다 첫 매칭 행을 찾으면 즉시 중단하므로 대용량 데이터에 유리합니다.`,
+     solution:`WHERE EXISTS (SELECT 1 FROM ORDERS O WHERE O.PROD_ID = P.PROD_ID) — P.PROD_ID를 참조하는 상관 서브쿼리(correlated subquery)입니다. 주문이 하나라도 있는 상품만 결과에 포함됩니다.`},
+    {t:'ALL / ANY',d:'모든/하나의 값보다 큰 사원',sql:`-- ALL: 모든 SALESMAN 급여보다 높은 사원\nSELECT ENAME, SAL FROM EMP\nWHERE SAL > ALL (SELECT SAL FROM EMP WHERE JOB='SALESMAN');\n\n-- ANY: ANALYST 중 한 명보다 급여가 높은 사원\nSELECT ENAME, SAL FROM EMP\nWHERE SAL > ANY (SELECT SAL FROM EMP WHERE JOB='ANALYST');`,
+     hint:`ALL: 서브쿼리의 모든 값보다 크거나 작아야 함 / ANY: 서브쿼리의 값 중 하나라도 만족하면 됩니다.`,
+     solution:`> ALL (서브쿼리)는 서브쿼리 MAX보다 큰 경우, > ANY는 서브쿼리 MIN보다 큰 경우와 동일합니다. SQLD 시험에서 헷갈리기 쉬운 개념이므로 주의하세요.`},
+  ]},
+  {g:'그룹 함수',items:[
+    {t:'ROLLUP (소계+합계)',d:'부서·직무별 급여 소계 자동 생성',sql:`SELECT DEPTNO, JOB, COUNT(*) AS CNT, SUM(SAL) AS TOTAL_SAL\nFROM EMP\nGROUP BY ROLLUP(DEPTNO, JOB)\nORDER BY DEPTNO NULLS LAST, JOB NULLS LAST;`,
+     hint:`GROUP BY ROLLUP(A, B) — (A,B)별 소계 → A별 소계 → 전체 합계를 자동으로 생성합니다.`,
+     solution:`ROLLUP(DEPTNO, JOB)은 부서+직무별 → 부서별 → 전체 순의 소계 행을 추가합니다. 소계 행에서는 해당 컬럼이 NULL로 표시됩니다. Oracle SQLD 핵심 출제 항목입니다.`},
+    {t:'CUBE (모든 조합 소계)',d:'ROLLUP보다 더 많은 소계 행',sql:`SELECT DEPTNO, JOB, SUM(SAL) AS TOTAL_SAL\nFROM EMP\nGROUP BY CUBE(DEPTNO, JOB)\nORDER BY DEPTNO NULLS LAST, JOB NULLS LAST;`,
+     hint:`CUBE(A, B) — 가능한 모든 컬럼 조합에 대한 소계를 생성합니다. ROLLUP보다 더 많은 집계 행이 나옵니다.`,
+     solution:`CUBE(DEPTNO, JOB)은 (DEPTNO+JOB), DEPTNO별, JOB별, 전체 — 4종류의 집계를 모두 생성합니다. ROLLUP은 계층적, CUBE는 모든 교차 집계를 생성하는 차이가 있습니다.`},
+    {t:'GROUPING SETS',d:'원하는 소계 조합만 지정',sql:`SELECT DEPTNO, JOB, SUM(SAL) AS TOTAL_SAL\nFROM EMP\nGROUP BY GROUPING SETS((DEPTNO), (JOB))\nORDER BY DEPTNO NULLS LAST, JOB NULLS LAST;`,
+     hint:`GROUPING SETS((A), (B)) — 원하는 집계 조합만 명시적으로 지정합니다. ROLLUP/CUBE의 일부만 필요할 때 사용합니다.`,
+     solution:`GROUPING SETS((DEPTNO), (JOB))은 부서별 집계와 직무별 집계 두 가지만 생성합니다. ROLLUP처럼 계층 소계도 없고 CUBE처럼 교차 집계도 없습니다. 필요한 집계만 선택할 수 있어 효율적입니다.`},
+  ]},
+  {g:'윈도우 함수',items:[
+    {t:'RANK (순위)',d:'급여 순위 — 동점 시 같은 순위',sql:`SELECT ENAME, SAL,\n       RANK() OVER (ORDER BY SAL DESC) AS SAL_RANK\nFROM EMP;`,
+     hint:`RANK() OVER (ORDER BY 컬럼 DESC) — 동점자는 같은 순위를 받고, 다음 순위는 동점자 수만큼 건너뜁니다(1,1,3...).`,
+     solution:`RANK()는 동점 시 같은 순위(1위 2명이면 3위로 바로 이동). DENSE_RANK()는 건너뛰지 않음(1,1,2). ROW_NUMBER()는 동점 무관 고유 순번입니다. SQLD 시험에서 세 함수의 차이를 꼭 구분하세요.`},
+    {t:'PARTITION BY',d:'부서 내 급여 순위',sql:`SELECT DEPTNO, ENAME, SAL,\n       RANK() OVER (PARTITION BY DEPTNO ORDER BY SAL DESC) AS DEPT_RANK\nFROM EMP;`,
+     hint:`PARTITION BY — 그룹별로 독립적인 윈도우를 생성합니다. GROUP BY처럼 행을 묶되 원본 행 수는 유지됩니다.`,
+     solution:`RANK() OVER (PARTITION BY DEPTNO ORDER BY SAL DESC) — 각 부서(DEPTNO)를 독립적으로 순위를 매깁니다. GROUP BY와 달리 다른 컬럼(ENAME, SAL)도 SELECT에 사용 가능합니다.`},
+    {t:'ROW_NUMBER (고유 순번)',d:'부서별 입사일 순 순번',sql:`SELECT DEPTNO, ENAME, HIREDATE,\n       ROW_NUMBER() OVER (PARTITION BY DEPTNO ORDER BY HIREDATE) AS ROW_NUM\nFROM EMP ORDER BY DEPTNO, HIREDATE;`,
+     hint:`ROW_NUMBER() — 동점이어도 고유한 순번을 부여합니다. 1,2,3... 순서로 중복 없이 부여됩니다.`,
+     solution:`PARTITION BY DEPTNO ORDER BY HIREDATE — 부서별로 입사일이 빠른 순으로 1번부터 순번을 부여합니다. 동점자가 있어도 무조건 고유 번호가 부여됩니다. 페이징 처리에 자주 활용됩니다.`},
+    {t:'SUM OVER (누적 합계)',d:'입사일순 급여 누적 / 부서 합계',sql:`SELECT ENAME, DEPTNO, HIREDATE, SAL,\n       SUM(SAL) OVER (ORDER BY HIREDATE)        AS CUMUL_SAL,\n       SUM(SAL) OVER (PARTITION BY DEPTNO)       AS DEPT_TOTAL\nFROM EMP ORDER BY HIREDATE;`,
+     hint:`SUM(컬럼) OVER (ORDER BY ...) — ORDER BY가 있으면 누적 합계, 없으면 전체(또는 파티션) 합계가 됩니다.`,
+     solution:`SUM(SAL) OVER (ORDER BY HIREDATE)는 입사일 순서로 급여를 누적합산합니다. SUM(SAL) OVER (PARTITION BY DEPTNO)는 부서 전체 합계를 각 행에 보여줍니다. OVER 안의 내용에 따라 의미가 달라집니다.`},
+    {t:'LAG / LEAD',d:'이전·다음 사원 급여 비교',sql:`SELECT ENAME, HIREDATE, SAL,\n       LAG(SAL,1,0)  OVER (ORDER BY HIREDATE) AS PREV_SAL,\n       LEAD(SAL,1,0) OVER (ORDER BY HIREDATE) AS NEXT_SAL,\n       SAL - LAG(SAL,1,SAL) OVER (ORDER BY HIREDATE) AS DIFF\nFROM EMP ORDER BY HIREDATE;`,
+     hint:`LAG(컬럼, N, 기본값) — N행 이전 값 참조 / LEAD — N행 이후 값 참조. 시계열 비교에 사용합니다.`,
+     solution:`LAG(SAL,1,0)는 이전 행의 SAL(없으면 0)을 가져옵니다. LEAD는 반대로 다음 행을 봅니다. SAL - LAG(SAL,1,SAL)로 이전 대비 변화량을 계산할 수 있습니다.`},
+    {t:'FIRST_VALUE / LAST_VALUE',d:'부서 내 첫/마지막 입사자',sql:`SELECT DEPTNO, ENAME, HIREDATE,\n       FIRST_VALUE(ENAME) OVER (PARTITION BY DEPTNO ORDER BY HIREDATE) AS FIRST_EMP,\n       LAST_VALUE(ENAME)  OVER (\n         PARTITION BY DEPTNO ORDER BY HIREDATE\n         ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING\n       ) AS LAST_EMP\nFROM EMP ORDER BY DEPTNO, HIREDATE;`,
+     hint:`FIRST_VALUE — 파티션 내 첫 번째 값, LAST_VALUE — 마지막 값. LAST_VALUE는 기본 프레임이 현재 행까지이므로 UNBOUNDED FOLLOWING이 필요합니다.`,
+     solution:`LAST_VALUE는 기본적으로 현재 행까지만 프레임을 잡기 때문에 ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING을 명시해야 파티션 전체의 마지막 값을 올바르게 가져옵니다.`},
+  ]},
+  {g:'집합 연산자',items:[
+    {t:'UNION (합집합)',d:'컴공 전공 OR 1학년 학번',sql:`SELECT STU_ID FROM STUDENTS WHERE MAJOR = '컴퓨터공학'\nUNION\nSELECT STU_ID FROM STUDENTS WHERE YEAR = 1;`,
+     hint:`UNION — 두 쿼리 결과를 합칩니다. 중복은 제거됩니다. 중복을 포함하려면 UNION ALL을 사용합니다.`,
+     solution:`컴퓨터공학 전공자 OR 1학년 학생의 학번을 구합니다. UNION은 자동으로 중복 제거. UNION ALL은 중복 포함. 두 SELECT의 컬럼 수와 타입이 일치해야 합니다.`},
+    {t:'INTERSECT (교집합)',d:'컴공 전공 AND 1학년 학번',sql:`SELECT STU_ID FROM STUDENTS WHERE MAJOR = '컴퓨터공학'\nINTERSECT\nSELECT STU_ID FROM STUDENTS WHERE YEAR = 1;`,
+     hint:`INTERSECT — 두 쿼리 결과에 모두 포함된 행만 반환합니다.`,
+     solution:`컴퓨터공학 전공 AND 1학년인 학번만 반환합니다. WHERE절에 AND로 합쳐도 같은 결과가 나오지만, 서로 다른 테이블이나 복잡한 쿼리의 교집합을 구할 때 INTERSECT가 유용합니다.`},
+    {t:'EXCEPT / MINUS (차집합)',d:'수강했지만 90점 미만 학번',sql:`-- SQLite: EXCEPT  /  Oracle: MINUS\nSELECT STU_ID FROM ENROLL\nEXCEPT\nSELECT STU_ID FROM ENROLL WHERE SCORE >= 90;`,
+     hint:`EXCEPT — 왼쪽 결과에서 오른쪽 결과에 있는 행을 제거합니다. Oracle에서는 MINUS를 사용합니다.`,
+     solution:`ENROLL에 수강한 학번에서 90점 이상 받은 학번을 빼면, 수강했지만 90점 미만인 학번이 남습니다. Oracle SQLD 시험에서는 MINUS로 출제되므로 주의하세요.`},
+  ]},
+  {g:'뷰',items:[
+    {t:'VIEW 생성 및 조회',d:'부서별 사원 현황 가상 테이블',sql:`CREATE VIEW IF NOT EXISTS VW_DEPT_SUMMARY AS\n  SELECT D.DEPTNO, D.DNAME, D.LOC,\n         COUNT(E.EMPNO)      AS EMP_CNT,\n         ROUND(AVG(E.SAL),0) AS AVG_SAL,\n         MAX(E.SAL)           AS MAX_SAL\n  FROM DEPT D LEFT JOIN EMP E ON D.DEPTNO = E.DEPTNO\n  GROUP BY D.DEPTNO, D.DNAME, D.LOC;\n\nSELECT * FROM VW_DEPT_SUMMARY ORDER BY AVG_SAL DESC;`,
+     hint:`CREATE VIEW 뷰이름 AS SELECT ... — 자주 사용하는 복잡한 쿼리를 뷰로 저장해 테이블처럼 사용합니다.`,
+     solution:`CREATE VIEW IF NOT EXISTS로 중복 에러를 방지합니다. 뷰는 데이터를 저장하지 않고 쿼리를 저장합니다. SELECT * FROM VW_DEPT_SUMMARY처럼 조회할 때마다 내부 쿼리가 실행됩니다.`},
+  ]},
+  {g:'계층형 질의',items:[
+    {t:'루트 노드 조회',d:'최상위 관리자 (PID IS NULL)',sql:`SELECT NAME, POS FROM ORG_CHART WHERE PID IS NULL;`,
+     hint:`계층 구조에서 최상위 노드는 PID(부모ID)가 NULL인 행입니다.`,
+     solution:`WHERE PID IS NULL — 부모가 없는 루트 노드를 조회합니다. Oracle의 START WITH ... WHERE PID IS NULL에 해당합니다. SQLite는 WITH RECURSIVE를 사용한 재귀 CTE로 계층을 전개합니다.`},
+    {t:'하위 노드 전개 (WITH RECURSIVE)',d:'Oracle CONNECT BY → SQLite 재귀 CTE',sql:`WITH RECURSIVE TR AS (\n  SELECT ID, NAME, PID, POS, 0 AS LVL\n  FROM ORG_CHART WHERE PID IS NULL\n  UNION ALL\n  SELECT O.ID, O.NAME, O.PID, O.POS, TR.LVL+1\n  FROM ORG_CHART O JOIN TR ON O.PID = TR.ID\n)\nSELECT LVL, SUBSTR('          ',1,LVL*2) || NAME AS 조직도, POS\nFROM TR;`,
+     hint:`WITH RECURSIVE 구조: 기저 케이스(루트 조회) + UNION ALL + 재귀 케이스(자식 조회). Oracle의 CONNECT BY 대체입니다.`,
+     solution:`①루트부터 시작(LVL=0), ②재귀 케이스에서 현재 행 ID가 자식 PID와 일치하는 행을 JOIN, ③LVL+1로 단계 증가. SUBSTR로 들여쓰기를 표현하면 조직도처럼 시각화됩니다.`},
+  ]},
+  {g:'정규표현식',items:[
+    {t:'이메일 유효성 검증',d:'올바른 이메일 형식 필터링',sql:`SELECT MEM_ID, EMAIL\nFROM MEMBERS\nWHERE EMAIL LIKE '%@%.%'\n  AND EMAIL NOT LIKE '% %'\n  AND INSTR(EMAIL,'@') > 1;`,
+     hint:`SQLite는 REGEXP를 기본 지원하지 않으므로 LIKE 패턴과 INSTR로 이메일 형식을 검증합니다.`,
+     solution:`%@%.% 패턴 + 공백 없음 + @ 앞에 문자 있음(INSTR > 1) 세 조건으로 기본 이메일 형식을 검증합니다. 완벽한 이메일 검증을 위해서는 REGEXP가 필요하지만 SQLite 환경에서는 이 방법이 실용적입니다.`},
+    {t:'전화번호 패턴 검증',d:'010-XXXX-XXXX 형식만 조회',sql:`SELECT MEM_ID, PHONE\nFROM MEMBERS\nWHERE PHONE LIKE '010-____-____'\n  AND LENGTH(PHONE) = 13;`,
+     hint:`LIKE '010-____-____' — _는 임의의 문자 1개를 의미합니다. %는 임의의 문자 0개 이상입니다.`,
+     solution:`LIKE '010-____-____' AND LENGTH = 13으로 010-XXXX-XXXX 형식을 검증합니다. _는 정확히 한 자리를 의미하므로 4자리+4자리를 강제합니다. 전화번호 컬럼 정제 작업에 자주 사용되는 패턴입니다.`},
+  ]},
+  {g:'PIVOT · Top N · NULL',items:[
+    {t:'PIVOT (CASE + SUM)',d:'Oracle PIVOT → SQLite CASE 방식',sql:`SELECT\n  SUM(CASE WHEN CATEGORY='가전' THEN 1 ELSE 0 END) AS 가전_수,\n  SUM(CASE WHEN CATEGORY='가구' THEN 1 ELSE 0 END) AS 가구_수,\n  SUM(CASE WHEN CATEGORY='문구' THEN 1 ELSE 0 END) AS 문구_수,\n  SUM(CASE WHEN CATEGORY='패션' THEN 1 ELSE 0 END) AS 패션_수\nFROM PRODUCTS;`,
+     hint:`CASE WHEN 카테고리='가전' THEN 1 ELSE 0 END — 조건에 맞으면 1, 아니면 0으로 변환 후 SUM하면 카운트가 됩니다.`,
+     solution:`Oracle의 PIVOT은 직접 지원되지만 SQLite는 CASE+SUM 방식으로 행을 열로 전환합니다. 이 패턴(CASE WHEN + 집계)은 SQLD 시험에서도 자주 출제됩니다.`},
+    {t:'LIMIT / OFFSET (Top N)',d:'Oracle ROWNUM → SQLite LIMIT',sql:`-- Top 5 급여\nSELECT ENAME, SAL, RANK() OVER (ORDER BY SAL DESC) AS RNK\nFROM EMP ORDER BY SAL DESC LIMIT 5;\n\n-- 6~10위 (페이징)\nSELECT ENAME, SAL FROM EMP\nORDER BY SAL DESC LIMIT 5 OFFSET 5;`,
+     hint:`ORDER BY + LIMIT N — 상위 N개만 조회. LIMIT N OFFSET M — M번째 이후 N개를 조회(페이징).`,
+     solution:`Oracle의 ROWNUM <= N 대신 SQLite는 LIMIT/OFFSET을 사용합니다. SQLD 시험에서는 Oracle ROWNUM 방식이 출제되므로 양쪽 문법을 모두 이해해야 합니다.`},
+    {t:'집계 함수와 NULL',d:'AVG는 NULL을 자동 제외',sql:`SELECT COUNT(*) AS 전체행,\n       COUNT(DISC_RATE) AS NULL제외건수,\n       AVG(DISC_RATE) AS 평균할인율\nFROM PRODUCTS;`,
+     hint:`COUNT(*)는 NULL 포함 전체 행 수, COUNT(컬럼)은 NULL 제외 행 수. AVG도 자동으로 NULL을 제외합니다.`,
+     solution:`COUNT(*) vs COUNT(DISC_RATE) 차이: DISC_RATE가 NULL인 행은 COUNT(컬럼)에서 제외됩니다. AVG(DISC_RATE)도 NULL 행을 무시하고 계산합니다. SQLD 시험 핵심 개념으로 자주 출제됩니다.`},
+    {t:'CASE 표현식',d:'조건별 값 분기 처리',sql:`SELECT ENAME, SAL,\n       CASE WHEN SAL >= 3000 THEN 'HIGH'\n            WHEN SAL >= 1500 THEN 'MID'\n            ELSE 'LOW' END AS SAL_LVL\nFROM EMP;`,
+     hint:`CASE WHEN 조건1 THEN 결과1 WHEN 조건2 THEN 결과2 ELSE 기본값 END — 조건을 순서대로 평가하며 처음 만족하는 결과를 반환합니다.`,
+     solution:`SAL >= 3000이면 'HIGH', 1500~2999이면 'MID', 그 외는 'LOW'. ELSE를 생략하면 NULL이 반환됩니다. Oracle DECODE()의 현대적 대체이며, Oracle도 CASE를 지원합니다.`},
+  ]},
+  {g:'DML',items:[
+    {t:'INSERT (단건 / 다건)',d:'신규 행 삽입',sql:`INSERT INTO DEPT VALUES(70, 'FINANCE', 'BUSAN');\nSELECT * FROM DEPT;\n\nINSERT INTO PRODUCTS VALUES\n  ('P016', '스탠드 조명', '가구', 85000, 0.0),\n  ('P017', '에어팟 프로', '가전', 359000, 0.1);\nSELECT * FROM PRODUCTS WHERE PROD_ID IN ('P016','P017');`,
+     hint:`INSERT INTO 테이블 VALUES (...) — 단건 삽입. 여러 행은 VALUES (...), (...) 형태로 한 번에 삽입 가능합니다.`,
+     solution:`VALUES(70,'FINANCE','BUSAN')처럼 컬럼 순서에 맞게 값을 나열합니다. 특정 컬럼만 지정할 경우 INSERT INTO 테이블(컬럼1, 컬럼2) VALUES(...)로 씁니다. 다건 삽입 시 VALUES (행1), (행2)처럼 쉼표로 구분합니다.`},
+    {t:'UPDATE (조건부 수정)',d:'할인율 NULL → 0.05 일괄 수정',sql:`UPDATE PRODUCTS SET DISC_RATE = 0.05 WHERE DISC_RATE IS NULL;\nSELECT PROD_ID, PROD_NAME, DISC_RATE FROM PRODUCTS ORDER BY DISC_RATE;`,
+     hint:`UPDATE 테이블 SET 컬럼=값 WHERE 조건 — WHERE를 빠뜨리면 전체 행이 수정됩니다!`,
+     solution:`UPDATE PRODUCTS SET DISC_RATE = 0.05 WHERE DISC_RATE IS NULL — DISC_RATE가 NULL인 행만 0.05로 업데이트합니다. WHERE 조건 없이 실행하면 테이블 전체가 수정되므로 반드시 조건을 확인하세요.`},
+    {t:'DELETE (조건부 삭제)',d:'수량 1인 주문 중 오래된 5건 삭제',sql:`DELETE FROM ORDERS\nWHERE ORDER_ID IN (\n  SELECT ORDER_ID FROM ORDERS\n  WHERE QTY = 1 ORDER BY ORDER_DATE ASC LIMIT 5\n);\nSELECT COUNT(*) AS REMAIN_CNT FROM ORDERS;`,
+     hint:`DELETE FROM 테이블 WHERE 조건 — WHERE 없이 사용하면 전체 행 삭제. ORDER BY + LIMIT로 특정 범위만 선택해 삭제할 수 있습니다.`,
+     solution:`서브쿼리로 QTY=1인 주문 중 오래된 5건의 ORDER_ID를 찾아 삭제합니다. DELETE의 WHERE IN (서브쿼리) 패턴은 조건부 삭제에 자주 활용됩니다.`},
+    {t:'MERGE 대체 (INSERT OR REPLACE)',d:'Oracle MERGE → SQLite 대체',sql:`INSERT OR REPLACE INTO PRODUCTS(PROD_ID, PROD_NAME, CATEGORY, PRICE, DISC_RATE)\nVALUES('P001', '삼성 갤럭시 S24 Ultra', '가전', 1350000, 0.07);\nSELECT * FROM PRODUCTS WHERE PROD_ID = 'P001';`,
+     hint:`INSERT OR REPLACE는 PK가 중복이면 기존 행을 삭제 후 새 행을 삽입합니다. Oracle MERGE와 유사합니다.`,
+     solution:`P001이 이미 존재하므로 기존 행이 삭제되고 새 정보(Ultra, 1350000원, 7% 할인)로 대체됩니다. Oracle MERGE는 조건에 따라 INSERT/UPDATE를 선택하지만 SQLite는 INSERT OR REPLACE로 대체합니다.`},
+  ]},
+  {g:'DDL',items:[
+    {t:'CREATE TABLE (제약조건)',d:'NOT NULL · CHECK · DEFAULT · FK',sql:`CREATE TABLE IF NOT EXISTS SCORE_BOARD (\n  SCORE_ID INTEGER PRIMARY KEY AUTOINCREMENT,\n  STU_ID   TEXT NOT NULL REFERENCES STUDENTS(STU_ID),\n  SUBJECT  TEXT NOT NULL,\n  SCORE    INTEGER CHECK(SCORE BETWEEN 0 AND 100),\n  GRADE    TEXT DEFAULT 'F',\n  REG_DATE TEXT DEFAULT (date('now'))\n);\nINSERT INTO SCORE_BOARD(STU_ID,SUBJECT,SCORE,GRADE) VALUES('S2024001','데이터베이스',95,'A+');\nSELECT * FROM SCORE_BOARD;`,
+     hint:`PRIMARY KEY, NOT NULL, CHECK(조건), DEFAULT 기본값, REFERENCES 테이블(컬럼) — 테이블 생성 시 데이터 무결성을 보장하는 제약조건입니다.`,
+     solution:`AUTOINCREMENT로 자동 증가 PK를 생성합니다. CHECK(SCORE BETWEEN 0 AND 100)은 유효 범위를 강제합니다. DEFAULT (date('now'))는 현재 날짜를 기본값으로 사용합니다.`},
+    {t:'ALTER TABLE (컬럼 추가)',d:'SQLite: ADD COLUMN만 지원',sql:`ALTER TABLE PRODUCTS ADD COLUMN STOCK INTEGER DEFAULT 0;\nSELECT PROD_ID, PROD_NAME, PRICE, STOCK FROM PRODUCTS LIMIT 5;`,
+     hint:`ALTER TABLE 테이블 ADD COLUMN 컬럼명 타입 — SQLite는 컬럼 추가만 지원합니다. 컬럼 삭제·수정은 지원하지 않습니다.`,
+     solution:`ADD COLUMN STOCK INTEGER DEFAULT 0 — 기존 데이터가 있는 테이블에 새 컬럼을 추가합니다. NOT NULL 컬럼 추가 시 DEFAULT 값을 반드시 지정해야 합니다. Oracle에서는 MODIFY, RENAME COLUMN 등 더 다양한 ALTER 옵션을 지원합니다.`},
+    {t:'DROP / TRUNCATE 대체',d:'TRUNCATE 미지원 → DELETE FROM 대체',sql:`CREATE TABLE IF NOT EXISTS TEMP_LOG (ID INTEGER, MSG TEXT, LOG_DATE TEXT);\nINSERT INTO TEMP_LOG VALUES(1,'테스트',date('now')),(2,'로그',date('now'));\nSELECT * FROM TEMP_LOG;\n\nDELETE FROM TEMP_LOG;\nSELECT COUNT(*) AS CNT FROM TEMP_LOG;\n\nDROP TABLE IF EXISTS TEMP_LOG;`,
+     hint:`DROP은 테이블 구조까지 삭제, TRUNCATE/DELETE는 데이터만 삭제합니다. SQLite는 TRUNCATE 미지원 → DELETE FROM으로 대체합니다.`,
+     solution:`TRUNCATE는 DDL로 롤백 불가, DELETE는 DML로 롤백 가능한 차이가 있습니다. SQLite는 TRUNCATE가 없으므로 DELETE FROM으로 전체 데이터를 삭제합니다. DROP TABLE은 테이블 구조 자체를 삭제합니다.`},
+  ]},
+  {g:'TCL',items:[
+    {t:'COMMIT / ROLLBACK',d:'트랜잭션 영구저장 / 되돌리기',sql:`BEGIN;\n  INSERT INTO DEPT VALUES(70, 'FINANCE', 'BUSAN');\nCOMMIT;\nSELECT * FROM DEPT;\n\nBEGIN;\n  UPDATE DEPT SET LOC = 'INCHEON' WHERE DEPTNO = 70;\n  DELETE FROM DEPT WHERE DEPTNO = 50;\nROLLBACK;\nSELECT * FROM DEPT ORDER BY DEPTNO;`,
+     hint:`BEGIN으로 트랜잭션 시작, COMMIT으로 영구 저장, ROLLBACK으로 시작 시점으로 되돌립니다.`,
+     solution:`BEGIN 이후 변경사항은 ROLLBACK하면 모두 취소됩니다. COMMIT 후에는 되돌릴 수 없습니다. 트랜잭션은 ACID(원자성·일관성·격리성·지속성)를 보장합니다.`},
+    {t:'SAVEPOINT (부분 롤백)',d:'중간 저장점으로만 롤백',sql:`BEGIN;\n  INSERT INTO DEPT VALUES(70, 'FINANCE', 'BUSAN');\n  SAVEPOINT SP1;\n  INSERT INTO DEPT VALUES(80, 'LEGAL', 'JEJU');\n  SAVEPOINT SP2;\n  INSERT INTO DEPT VALUES(90, 'TEST', 'UNKNOWN');\nROLLBACK TO SAVEPOINT SP2;\nSELECT * FROM DEPT WHERE DEPTNO >= 70;\nCOMMIT;`,
+     hint:`SAVEPOINT 이름으로 중간 저장점을 만들고, ROLLBACK TO SAVEPOINT 이름으로 해당 지점으로만 되돌립니다.`,
+     solution:`SP2 이후의 작업(90번 부서 INSERT)만 취소됩니다. SP1과 SP2 사이의 작업(80번 INSERT)은 그대로 유지됩니다. COMMIT 전까지는 SAVEPOINT를 활용해 부분 취소가 가능합니다.`},
+  ]},
+  {g:'DCL (개념)',items:[
+    {t:'GRANT / REVOKE (Oracle 개념)',d:'SQLite 미지원 — 테이블 목록으로 확인',sql:`-- DCL은 SQLite에서 실행 불가 (단일 사용자 환경)\n-- [Oracle] GRANT SELECT, INSERT ON EMP TO HR_USER;\n-- [Oracle] REVOKE INSERT ON EMP FROM HR_USER;\n\n-- SQLite: 현재 테이블 목록 확인\nSELECT name AS TABLE_NAME FROM sqlite_master\nWHERE type = 'table' ORDER BY name;`,
+     hint:`GRANT 권한 ON 객체 TO 사용자 / REVOKE 권한 ON 객체 FROM 사용자 — Oracle 권한 부여/회수 명령어입니다.`,
+     solution:`SQLite는 단일 사용자 환경이라 DCL이 의미 없습니다. Oracle에서는 GRANT SELECT ON EMP TO HR_USER로 특정 사용자에게 권한을 부여합니다. WITH GRANT OPTION(재부여 가능)도 SQLD 시험 출제 포인트입니다.`},
+  ]},
+];
+
+/* ════════════════════════════════════════════════════════
+   ORACLE → SQLITE 자동 변환기
+════════════════════════════════════════════════════════ */
+const DEFAULT_QUERY = '-- SQL을 입력하고 Ctrl+Enter로 실행하세요\nSELECT * FROM EMP;';
+
+const ORACLE_UNSUPPORTED = [
+  { re: /\bCONNECT\s+BY\b/i,  name: 'CONNECT BY' },
+  { re: /\bSTART\s+WITH\b/i,  name: 'START WITH' },
+  { re: /\bDECODE\s*\(/i,     name: 'DECODE()' },
+  { re: /\bNVL2\s*\(/i,       name: 'NVL2()' },
+  { re: /\bPIVOT\s*\(/i,      name: 'PIVOT()' },
+  { re: /\bUNPIVOT\b/i,       name: 'UNPIVOT' },
+  { re: /\bLISTAGG\s*\(/i,    name: 'LISTAGG()' },
+  { re: /\bWM_CONCAT\s*\(/i,  name: 'WM_CONCAT()' },
+  { re: /\bFROM\s+DUAL\b/i,   name: 'DUAL' },
+  { re: /\bROWID\b/i,         name: 'ROWID' },
+];
+function detectUnsupportedOracle(sql) {
+  return ORACLE_UNSUPPORTED.filter(u => u.re.test(sql)).map(u => u.name);
+}
+
+function transpileOracle(sql) {
+  let out = sql;
+  const changes = [];
+
+  // NVL(x, y) → IFNULL(x, y)
+  if (/\bNVL\s*\(/i.test(out)) {
+    out = out.replace(/\bNVL\s*\(/gi, 'IFNULL(');
+    changes.push('NVL() → IFNULL()');
+  }
+
+  // SYSDATE → date('now')
+  if (/\bSYSDATE\b/i.test(out)) {
+    out = out.replace(/\bSYSDATE\b/gi, "date('now')");
+    changes.push("SYSDATE → date('now')");
+  }
+
+  // MINUS (집합 연산자) → EXCEPT
+  if (/\bMINUS\b/i.test(out)) {
+    out = out.replace(/\bMINUS\b/gi, 'EXCEPT');
+    changes.push('MINUS → EXCEPT');
+  }
+
+  // MOD(a, b) → (a % b)
+  if (/\bMOD\s*\(/i.test(out)) {
+    out = out.replace(/\bMOD\s*\(\s*([^,]+?)\s*,\s*([^)]+?)\s*\)/gi, '($1 % $2)');
+    changes.push('MOD(a,b) → a % b');
+  }
+
+  // ADD_MONTHS(date, n) → date(date, '+n month')
+  if (/\bADD_MONTHS\s*\(/i.test(out)) {
+    out = out.replace(/\bADD_MONTHS\s*\(\s*([^,]+?)\s*,\s*(-?\d+)\s*\)/gi, (_, d, n) => {
+      const num = parseInt(n);
+      return `date(${d.trim()}, '${num >= 0 ? '+' : ''}${num} month')`;
+    });
+    changes.push('ADD_MONTHS() → date()');
+  }
+
+  // TO_CHAR(val) / TO_CHAR(date, 'format')
+  if (/\bTO_CHAR\s*\(/i.test(out)) {
+    out = out.replace(/\bTO_CHAR\s*\(\s*([^,)]+?)\s*(?:,\s*'([^']+)')?\s*\)/gi, (_, val, fmt) => {
+      if (!fmt) return `CAST(${val.trim()} AS TEXT)`;
+      const sfmt = fmt
+        .replace(/YYYY/g,'%Y').replace(/YY/g,'%y')
+        .replace(/MM/g,'%m').replace(/DD/g,'%d')
+        .replace(/HH24/g,'%H').replace(/HH/g,'%I')
+        .replace(/MI/g,'%M').replace(/SS/g,'%S');
+      return `STRFTIME('${sfmt}', ${val.trim()})`;
+    });
+    changes.push('TO_CHAR() → STRFTIME()');
+  }
+
+  // TO_DATE(str, fmt) → date(str)
+  if (/\bTO_DATE\s*\(/i.test(out)) {
+    out = out.replace(/\bTO_DATE\s*\(\s*([^,)]+?)\s*(?:,[^)]+)?\s*\)/gi, (_, s) => `date(${s.trim()})`);
+    changes.push('TO_DATE() → date()');
+  }
+
+  // WHERE ROWNUM <= N → LIMIT N  /  WHERE ROWNUM < N → LIMIT N-1
+  const leMatch = out.match(/WHERE\s+ROWNUM\s*<=\s*(\d+)/i);
+  const ltMatch = out.match(/WHERE\s+ROWNUM\s*<\s*(\d+)/i);
+  if (leMatch) {
+    const n = parseInt(leMatch[1]);
+    out = out.replace(/WHERE\s+ROWNUM\s*<=\s*\d+/i, '').replace(/;?\s*$/, '') + ` LIMIT ${n}`;
+    changes.push(`ROWNUM <= ${n} → LIMIT ${n}`);
+  } else if (ltMatch) {
+    const n = parseInt(ltMatch[1]) - 1;
+    out = out.replace(/WHERE\s+ROWNUM\s*<\s*\d+/i, '').replace(/;?\s*$/, '') + ` LIMIT ${n}`;
+    changes.push(`ROWNUM < ${parseInt(ltMatch[1])} → LIMIT ${n}`);
+  }
+
+  return { sql: out.trim(), changes };
+}
+
+/* ════════════════════════════════════════════════════════
+   STATE
+════════════════════════════════════════════════════════ */
+let db = null;
+let currTab = 'query';
+let tabContent = {query:'-- SQL을 입력하고 Ctrl+Enter로 실행하세요\nSELECT * FROM EMP;', ddl:'-- DDL / DML 구문을 입력하세요\nCREATE TABLE TEST (ID INT);'};
+let editorView = null;
+let saveTimer = null;
+let schemaFilter = '';
+let catFilter = 'ALL';
+let completed = new Set(JSON.parse(localStorage.getItem('sqld-done') || '[]'));
+let lastResultData = null;
+let sortCol = null, sortDir = 1;
+
+/* ════════════════════════════════════════════════════════
+   UTILS
+════════════════════════════════════════════════════════ */
+const esc = v => String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+
+function toast(msg, ms = 2000) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), ms);
+}
+
+/* ════════════════════════════════════════════════════════
+   CODEMIRROR SETUP
+════════════════════════════════════════════════════════ */
+function initEditor() {
+  const lightTheme = EditorView.theme({
+    '&': {height: '100%', background: '#FFFFFF'},
+    '.cm-scroller': {overflow: 'auto'},
+    '.cm-content': {padding: '12px 0', caretColor: '#F04B23'},
+    '.cm-line': {padding: '0 16px'},
+    '.cm-gutters': {background: '#F8F9FA', borderRight: '1px solid #E5E7EB', color: '#9CA3AF'},
+    '.cm-lineNumbers .cm-gutterElement': {padding: '0 8px 0 4px', minWidth: '32px'},
+    '.cm-activeLine': {background: 'rgba(240,75,35,0.04)'},
+    '.cm-activeLineGutter': {background: 'rgba(240,75,35,0.04)'},
+    '.cm-selectionBackground': {background: 'rgba(59,130,246,0.15) !important'},
+    '.cm-focused .cm-selectionBackground': {background: 'rgba(59,130,246,0.25) !important'},
+    '.cm-cursor,.cm-dropCursor': {borderLeftColor: '#F04B23 !important'},
+    '&.cm-focused': {outline: 'none'},
+    '.cm-tooltip': {background: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: '6px', boxShadow: '0 4px 16px rgba(0,0,0,0.1)'},
+    '.cm-tooltip-autocomplete ul li[aria-selected]': {background: '#F04B23', color: '#FFFFFF'},
+  }, {dark: false});
+
+  const cursorListener = EditorView.updateListener.of(u => {
+    if (u.selectionSet || u.docChanged) {
+      const pos = u.state.selection.main.head;
+      const line = u.state.doc.lineAt(pos);
+      document.getElementById('cursor-pos').textContent = `Ln ${line.number}, Col ${pos - line.from + 1}`;
+    }
+    if (u.docChanged) {
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(() => {
+        localStorage.setItem('sqld-editor-' + currTab, u.state.doc.toString());
+      }, 1000);
+    }
+  });
+
+  editorView = new EditorView({
+    doc: tabContent.query,
+    extensions: [basicSetup, sqlLang(), lightTheme, cursorListener],
+    parent: document.getElementById('editor-wrap'),
+  });
+}
+
+function getEditorSQL() {
+  return editorView ? editorView.state.doc.toString() : '';
+}
+
+function setEditorSQL(sql) {
+  if (!editorView) return;
+  editorView.dispatch({changes: {from: 0, to: editorView.state.doc.length, insert: sql}});
+}
+
+/* ════════════════════════════════════════════════════════
+   TAB SWITCHING
+════════════════════════════════════════════════════════ */
+function switchTab(name) {
+  tabContent[currTab] = getEditorSQL();
+  localStorage.setItem('sqld-editor-' + currTab, tabContent[currTab]);
+  currTab = name;
+  setEditorSQL(tabContent[currTab]);
+  document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
+  editorView && editorView.focus();
+}
+
+/* ════════════════════════════════════════════════════════
+   SCHEMA PANEL
+════════════════════════════════════════════════════════ */
+function renderDBPanel() {
+  const q = schemaFilter.toLowerCase();
+  const scroll = document.getElementById('db-scroll');
+  scroll.innerHTML = SCHEMA
+    .filter(t => !q || t.name.toLowerCase().includes(q) || t.cols.some(c => c.n.toLowerCase().includes(q)))
+    .map(t => {
+      const colsHtml = t.cols
+        .filter(c => !q || c.n.toLowerCase().includes(q) || t.name.toLowerCase().includes(q))
+        .map(c => `<div class="col-item" data-col="${c.n}">
+          <span class="col-name">${c.n}</span>
+          <span class="col-type">${c.t}</span>
+          ${c.pk ? '<span class="badge badge-pk">PK</span>' : ''}
+          ${c.fk ? '<span class="badge badge-fk">FK</span>' : ''}
+        </div>`).join('');
+      return `<div>
+        <div class="tbl-hd" data-tbl="${t.name}">
+          <i class="ti ti-table" style="font-size:12px;flex-shrink:0;color:var(--text3);"></i>
+          <span class="tbl-hd-name" data-tbl="${t.name}" title="클릭: SELECT * FROM ${t.name}">${t.name}</span>
+          <span class="tbl-rows-badge">${t.rows}</span>
+          <i class="ti ti-chevron-right chevron"></i>
+        </div>
+        <div class="tbl-cols${q ? ' open' : ''}">${colsHtml}</div>
+      </div>`;
+    }).join('');
+}
+
+// Event delegation for schema panel
+document.getElementById('db-scroll').addEventListener('click', e => {
+  const colItem = e.target.closest('.col-item');
+  if (colItem) {
+    const colName = colItem.dataset.col;
+    if (editorView) {
+      const pos = editorView.state.selection.main.head;
+      editorView.dispatch({changes: {from: pos, insert: colName}});
+      editorView.focus();
+    }
+    toast(`'${colName}' 삽입`);
+    return;
+  }
+  const tblName = e.target.closest('.tbl-hd-name');
+  if (tblName && e.target === tblName) {
+    const tbl = tblName.dataset.tbl;
+    setEditorSQL(`SELECT * FROM ${tbl};`);
+    switchTab('query');
+    toast(`SELECT * FROM ${tbl}`);
+    return;
+  }
+  const tblHd = e.target.closest('.tbl-hd');
+  if (tblHd) {
+    tblHd.classList.toggle('open');
+    const cols = tblHd.nextElementSibling;
+    if (cols) cols.classList.toggle('open');
+  }
+});
+
+/* ════════════════════════════════════════════════════════
+   EXAMPLE PANEL
+════════════════════════════════════════════════════════ */
+const ALL_CATS = ['ALL', ...EXAMPLES.map(g => g.g)];
+const TOTAL = EXAMPLES.reduce((s, g) => s + g.items.length, 0);
+
+function renderCatPills() {
+  document.getElementById('ex-filter').innerHTML = `<div class="cat-pills">${
+    ALL_CATS.map(c => `<button class="cat-pill${c === catFilter ? ' active' : ''}" data-cat="${esc(c)}">${esc(c)}</button>`).join('')
+  }</div>`;
+}
+
+function updateProgress() {
+  document.getElementById('ex-progress').textContent = `${completed.size} / ${TOTAL}`;
+}
+
+function renderExamples() {
+  const groups = catFilter === 'ALL' ? EXAMPLES : EXAMPLES.filter(g => g.g === catFilter);
+  let html = '';
+  groups.forEach(g => {
+    html += `<div class="ex-group-title">${esc(g.g)}</div>`;
+    g.items.forEach(item => {
+      const key = g.g + ':' + item.t;
+      const done = completed.has(key);
+      html += `<div class="ex-item${done ? ' done' : ''}" data-sql="${esc(item.sql)}" data-key="${esc(key)}">
+        <div class="ex-item-body">
+          <div class="ex-item-title">${esc(item.t)}</div>
+          <div class="ex-item-desc">${esc(item.d)}</div>
+          <div class="ex-item-footer">
+            <button class="ex-hint-btn" data-hint="${esc(item.hint || '')}">💡 힌트</button>
+            <button class="ex-sol-btn" data-sol="${esc(item.solution || '')}">📖 해설</button>
+          </div>
+          <div class="ex-expand-box hint-box"></div>
+          <div class="ex-expand-box sol-box"></div>
+        </div>
+        <div class="ex-check" data-key="${esc(key)}" title="완료 표시">
+          ${done ? '<i class="ti ti-check"></i>' : ''}
+        </div>
+      </div>`;
+    });
+  });
+  if (!html) html = '<div class="ex-empty">예제가 없습니다</div>';
+  document.getElementById('ex-panel').innerHTML = html;
+  updateProgress();
+}
+
+// Event delegation for example panel
+document.getElementById('ex-panel').addEventListener('click', e => {
+  const checkBtn = e.target.closest('.ex-check');
+  if (checkBtn) {
+    e.stopPropagation();
+    const key = checkBtn.dataset.key;
+    if (completed.has(key)) completed.delete(key);
+    else completed.add(key);
+    localStorage.setItem('sqld-done', JSON.stringify([...completed]));
+    renderExamples();
+    return;
+  }
+  const hintBtn = e.target.closest('.ex-hint-btn');
+  if (hintBtn) {
+    e.stopPropagation();
+    const box = hintBtn.closest('.ex-item-body').querySelector('.ex-expand-box.hint-box');
+    const isOpen = box.style.display === 'block';
+    box.textContent = hintBtn.dataset.hint;
+    box.style.display = isOpen ? 'none' : 'block';
+    hintBtn.textContent = isOpen ? '💡 힌트' : '💡 힌트 닫기';
+    hintBtn.classList.toggle('open', !isOpen);
+    return;
+  }
+  const solBtn = e.target.closest('.ex-sol-btn');
+  if (solBtn) {
+    e.stopPropagation();
+    const box = solBtn.closest('.ex-item-body').querySelector('.ex-expand-box.sol-box');
+    const isOpen = box.style.display === 'block';
+    box.textContent = solBtn.dataset.sol;
+    box.style.display = isOpen ? 'none' : 'block';
+    solBtn.textContent = isOpen ? '📖 해설' : '📖 해설 닫기';
+    solBtn.classList.toggle('open', !isOpen);
+    return;
+  }
+  const item = e.target.closest('.ex-item');
+  if (item) {
+    const cur = getEditorSQL().trim();
+    if (cur && cur !== DEFAULT_QUERY.trim()) {
+      if (!confirm('현재 작성 중인 SQL이 있습니다. 예제로 교체하겠습니까?')) return;
+    }
+    setEditorSQL(item.dataset.sql);
+    switchTab('query');
+  }
+});
+
+// Category filter delegation
+document.getElementById('ex-filter').addEventListener('click', e => {
+  const pill = e.target.closest('.cat-pill');
+  if (pill) {
+    catFilter = pill.dataset.cat;
+    renderCatPills();
+    renderExamples();
+  }
+});
+
+/* ════════════════════════════════════════════════════════
+   PANEL TOGGLES
+════════════════════════════════════════════════════════ */
+function toggleLeft() {
+  const p = document.getElementById('db-panel');
+  p.classList.toggle('collapsed');
+  const icon = document.querySelector('#btn-toggle-left i');
+  icon.className = p.classList.contains('collapsed')
+    ? 'ti ti-layout-sidebar-left-expand'
+    : 'ti ti-layout-sidebar-left-collapse';
+}
+function toggleRight() {
+  const p = document.getElementById('ex-panel-wrap');
+  p.classList.toggle('collapsed');
+  const icon = document.querySelector('#btn-toggle-right i');
+  icon.className = p.classList.contains('collapsed')
+    ? 'ti ti-layout-sidebar-right-expand'
+    : 'ti ti-layout-sidebar-right-collapse';
+}
+document.getElementById('btn-toggle-left').addEventListener('click', toggleLeft);
+document.getElementById('btn-toggle-right').addEventListener('click', toggleRight);
+document.getElementById('db-panel-strip').addEventListener('click', toggleLeft);
+document.getElementById('ex-panel-strip').addEventListener('click', toggleRight);
+
+/* ════════════════════════════════════════════════════════
+   RESIZE HANDLES
+════════════════════════════════════════════════════════ */
+function makeVResize(handleId, panelId, side) {
+  const handle = document.getElementById(handleId);
+  const panel = document.getElementById(panelId);
+  let dragging = false, startX = 0, startW = 0;
+  handle.addEventListener('mousedown', e => {
+    dragging = true; startX = e.clientX; startW = panel.offsetWidth;
+    handle.classList.add('dragging');
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove', e => {
+    if (!dragging) return;
+    const delta = side === 'left' ? e.clientX - startX : startX - e.clientX;
+    panel.style.width = Math.max(150, Math.min(startW + delta, 500)) + 'px';
+  });
+  document.addEventListener('mouseup', () => {
+    if (dragging) {
+      dragging = false; handle.classList.remove('dragging');
+      document.body.style.cursor = ''; document.body.style.userSelect = '';
+      localStorage.setItem('sqld-panel-' + panelId, panel.offsetWidth);
+    }
+  });
+}
+makeVResize('left-resize', 'db-panel', 'left');
+makeVResize('right-resize', 'ex-panel-wrap', 'right');
+
+// Vertical (H) drag handle
+(function() {
+  const handle = document.getElementById('h-resize');
+  const wrap = document.getElementById('editor-wrap');
+  let dragging = false, startY = 0, startH = 0;
+  handle.addEventListener('mousedown', e => {
+    dragging = true; startY = e.clientY; startH = wrap.offsetHeight;
+    handle.classList.add('dragging');
+    document.body.style.cursor = 'ns-resize';
+    document.body.style.userSelect = 'none';
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove', e => {
+    if (!dragging) return;
+    const newH = Math.max(80, Math.min(startH + (e.clientY - startY), window.innerHeight * .65));
+    wrap.style.height = newH + 'px';
+    editorView && editorView.requestMeasure();
+  });
+  document.addEventListener('mouseup', () => {
+    if (dragging) {
+      dragging = false;
+      handle.classList.remove('dragging');
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+      localStorage.setItem('sqld-editor-height', wrap.offsetHeight);
+    }
+  });
+})();
+
+/* ════════════════════════════════════════════════════════
+   SQL EXECUTION
+════════════════════════════════════════════════════════ */
+function renderVal(v) {
+  if (v === null) return '<span class="val-null">NULL</span>';
+  if (typeof v === 'number') return `<span class="val-num">${esc(v)}</span>`;
+  return `<span class="val-str">${esc(v)}</span>`;
+}
+
+function renderResultTable(cols, rows, idx) {
+  const sortedRows = sortCol !== null
+    ? [...rows].sort((a, b) => {
+        const av = a[sortCol], bv = b[sortCol];
+        if (av === null) return 1; if (bv === null) return -1;
+        return (av < bv ? -1 : av > bv ? 1 : 0) * sortDir;
+      })
+    : rows;
+
+  const headers = cols.map((c, i) => {
+    let cls = '';
+    if (sortCol === i) cls = sortDir === 1 ? ' sorted-asc' : ' sorted-desc';
+    const icon = sortCol === i ? (sortDir === 1 ? '↑' : '↓') : '↕';
+    return `<th data-colidx="${i}" class="${cls}">${esc(c)} <span class="sort-icon">${icon}</span></th>`;
+  }).join('');
+
+  const bodyRows = sortedRows.map(row => `<tr>${row.map(v => `<td>${renderVal(v)}</td>`).join('')}</tr>`).join('');
+
+  return `<div class="rtable-wrap">
+    <div class="rtable-title">
+      <span class="rtable-title-text">결과셋 ${idx + 1} — ${rows.length}행</span>
+      <button class="btn-csv-inline" data-resultidx="${idx}"><i class="ti ti-copy"></i> CSV</button>
+    </div>
+    <table class="rtable" data-resultidx="${idx}">
+      <thead><tr>${headers}</tr></thead>
+      <tbody>${bodyRows}</tbody>
+    </table>
+  </div>`;
+}
+
+document.getElementById('r-scroll').addEventListener('click', e => {
+  const csvBtn = e.target.closest('.btn-csv-inline');
+  if (csvBtn) {
+    const idx = parseInt(csvBtn.dataset.resultidx);
+    if (lastResultData && lastResultData[idx]) {
+      const r = lastResultData[idx];
+      const rows = [r.columns.join(','), ...r.values.map(row =>
+        row.map(v => v === null ? '' : `"${String(v).replace(/"/g, '""')}"`).join(',')
+      )];
+      navigator.clipboard.writeText(rows.join('\n')).then(() => toast(`결과셋 ${idx + 1} CSV 복사 완료!`));
+    }
+    return;
+  }
+  const th = e.target.closest('th[data-colidx]');
+  if (!th) return;
+  const ci = parseInt(th.dataset.colidx);
+  if (sortCol === ci) sortDir *= -1;
+  else { sortCol = ci; sortDir = 1; }
+  if (lastResultData) {
+    const html = lastResultData.map((r, i) => renderResultTable(r.columns, r.values, i)).join('');
+    document.getElementById('r-scroll').innerHTML = html;
+  }
+});
+
+function runSQL() {
+  if (!db) { toast('SQL 엔진 로드 중입니다'); return; }
+  const rawSql = getEditorSQL().trim();
+  if (!rawSql) return;
+
+  sortCol = null; sortDir = 1;
+  const btn = document.getElementById('btn-run');
+  btn.classList.add('loading'); btn.disabled = true;
+
+  const { sql, changes } = transpileOracle(rawSql);
+  const convertedHtml = changes.length
+    ? `<div class="convert-notice"><i class="ti ti-arrows-exchange"></i><span><b>Oracle → SQLite 자동 변환 완료</b> &nbsp;·&nbsp; ${changes.map(c=>`<code>${esc(c)}</code>`).join(' &nbsp; ')}</span></div>`
+    : '';
+
+  const t0 = performance.now();
+
+  setTimeout(() => {
+    try {
+      const results = db.exec(sql);
+      const ms = (performance.now() - t0).toFixed(1);
+      document.getElementById('r-time').textContent = ms + ' ms';
+      if (!results.length) {
+        document.getElementById('r-meta').textContent = '✔ 실행 완료';
+        document.getElementById('r-scroll').innerHTML =
+          `${convertedHtml}<div class="msg-box msg-ok"><i class="ti ti-check" style="font-size:18px;flex-shrink:0;"></i><div>명령어가 성공적으로 실행되었습니다.</div></div>`;
+        lastResultData = null;
+        updateStatus();
+      } else {
+        lastResultData = results;
+        const totalRows = results.reduce((s, r) => s + r.values.length, 0);
+        document.getElementById('r-meta').textContent = `✔ ${totalRows}행`;
+        document.getElementById('r-scroll').innerHTML = convertedHtml + results.map((r, i) => renderResultTable(r.columns, r.values, i)).join('');
+      }
+    } catch(e) {
+      const ms = (performance.now() - t0).toFixed(1);
+      document.getElementById('r-time').textContent = ms + ' ms';
+      document.getElementById('r-meta').textContent = '✘ 오류';
+      const unsupported = detectUnsupportedOracle(rawSql);
+      const oracleWarn = unsupported.length
+        ? `<div class="oracle-unsupported-hint">⚠ Oracle 전용 문법 감지: <strong>${unsupported.join(', ')}</strong><br>SQLite에서 지원되지 않습니다. 우측 패널에서 대체 구문을 확인하세요.</div>`
+        : '';
+      document.getElementById('r-scroll').innerHTML = `${convertedHtml}<div class="msg-box msg-err"><strong>SQL Error</strong><br>${esc(e.message)}</div>${oracleWarn}`;
+      lastResultData = null;
+    }
+    btn.classList.remove('loading'); btn.disabled = false;
+  }, 0);
+}
+
+/* ════════════════════════════════════════════════════════
+   OTHER BUTTONS
+════════════════════════════════════════════════════════ */
+document.getElementById('btn-clear').addEventListener('click', () => {
+  setEditorSQL('');
+  document.getElementById('r-scroll').innerHTML = '<div class="result-placeholder"><i class="ti ti-eraser"></i><p>초기화되었습니다</p></div>';
+  document.getElementById('r-meta').textContent = '';
+  document.getElementById('r-time').textContent = '';
+  lastResultData = null;
+});
+
+
+document.querySelectorAll('.tab').forEach(btn => {
+  btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+});
+document.getElementById('btn-run').addEventListener('click', runSQL);
+
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); runSQL(); }
+});
+
+/* ════════════════════════════════════════════════════════
+   SCHEMA SEARCH
+════════════════════════════════════════════════════════ */
+document.getElementById('schema-search').addEventListener('input', e => {
+  schemaFilter = e.target.value;
+  renderDBPanel();
+});
+
+/* ════════════════════════════════════════════════════════
+   MODAL
+════════════════════════════════════════════════════════ */
+function openModal() {
+  document.getElementById('modal-overlay').classList.add('show');
+}
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('show');
+  if (document.getElementById('no-show-check').checked) {
+    localStorage.setItem('sqld-no-show', '1');
+  }
+}
+document.getElementById('btn-modal-start').addEventListener('click', closeModal);
+document.getElementById('modal-close').addEventListener('click', closeModal);
+document.getElementById('modal-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal-overlay')) closeModal();
+});
+document.getElementById('env-chip').addEventListener('click', openModal);
+
+function openGuide()  { document.getElementById('guide-overlay').classList.add('show'); }
+function closeGuide() { document.getElementById('guide-overlay').classList.remove('show'); }
+document.getElementById('btn-guide').addEventListener('click', openGuide);
+document.getElementById('guide-close').addEventListener('click', closeGuide);
+document.getElementById('btn-guide-close').addEventListener('click', closeGuide);
+document.getElementById('guide-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('guide-overlay')) closeGuide();
+});
+
+document.getElementById('btn-progress-reset').addEventListener('click', () => {
+  if (!confirm('모든 학습 완료 기록을 초기화하겠습니까?')) return;
+  completed.clear();
+  localStorage.removeItem('sqld-done');
+  renderExamples();
+  toast('학습 진행도가 초기화되었습니다');
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeModal(); closeGuide(); }
+});
+
+/* ════════════════════════════════════════════════════════
+   STATUS
+════════════════════════════════════════════════════════ */
+function updateStatus() {
+  // 내부 상태 추적용 (UI에 노출하지 않음)
+}
+
+/* ════════════════════════════════════════════════════════
+   INIT
+════════════════════════════════════════════════════════ */
+async function init() {
+  const savedQuery = localStorage.getItem('sqld-editor-query');
+  const savedDdl   = localStorage.getItem('sqld-editor-ddl');
+  if (savedQuery) tabContent.query = savedQuery;
+  if (savedDdl)   tabContent.ddl   = savedDdl;
+
+  initEditor();
+
+  const savedH = localStorage.getItem('sqld-editor-height');
+  if (savedH) {
+    document.getElementById('editor-wrap').style.height = parseInt(savedH) + 'px';
+    editorView && editorView.requestMeasure();
+  }
+
+  const savedLeftW = localStorage.getItem('sqld-panel-db-panel');
+  if (savedLeftW) document.getElementById('db-panel').style.width = parseInt(savedLeftW) + 'px';
+  const savedRightW = localStorage.getItem('sqld-panel-ex-panel-wrap');
+  if (savedRightW) document.getElementById('ex-panel-wrap').style.width = parseInt(savedRightW) + 'px';
+
+  renderDBPanel();
+  renderCatPills();
+  renderExamples();
+
+  if (!localStorage.getItem('sqld-no-show')) {
+    setTimeout(openModal, 500);
+  }
+
+  try {
+    const SQL = await initSqlJs({
+      locateFile: f => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/${f}`
+    });
+    db = new SQL.Database();
+    db.run(INIT_SQL);
+  } catch(e) {
+    document.getElementById('r-scroll').innerHTML =
+      `<div class="msg-box msg-err"><strong>Engine Load Error</strong><br>${esc(e.message)}</div>`;
+  }
+}
+
+init();
+</script>
+</body>
+</html>
