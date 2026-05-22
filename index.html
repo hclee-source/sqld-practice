@@ -37,7 +37,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
   background:var(--bg3);border-radius:5px;padding:2px 8px;border:1px solid var(--border);
   font-family:var(--mono);}
 .hd-space{flex:1;}
-.hd-status{font-size:11px;color:var(--text2);font-family:var(--mono);margin-right:12px;flex-shrink:0;}
 .btn-hd{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2);
   background:var(--bg3);border:1px solid var(--border);border-radius:8px;
   padding:6px 12px;cursor:pointer;transition:.15s;white-space:nowrap;font-weight:500;}
@@ -1490,7 +1489,6 @@ function runSQL() {
         document.getElementById('r-scroll').innerHTML =
           `${convertedHtml}<div class="msg-box msg-ok"><i class="ti ti-check" style="font-size:18px;flex-shrink:0;"></i><div>명령어가 성공적으로 실행되었습니다.</div></div>`;
         lastResultData = null;
-        updateStatus();
       } else {
         lastResultData = results;
         const totalRows = results.reduce((s, r) => s + r.values.length, 0);
@@ -1579,13 +1577,6 @@ document.getElementById('btn-progress-reset').addEventListener('click', () => {
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') { closeModal(); closeGuide(); }
 });
-
-/* ════════════════════════════════════════════════════════
-   STATUS
-════════════════════════════════════════════════════════ */
-function updateStatus() {
-  // 내부 상태 추적용 (UI에 노출하지 않음)
-}
 
 /* ════════════════════════════════════════════════════════
    INIT
