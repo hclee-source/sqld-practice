@@ -5,7 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>골든래빗 SQLD SQL 실습 환경</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/tabler-icons.min.css">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
 :root{
   --bg:#EDEEF2;--bg2:#FFFFFF;--bg3:#F5F6F8;--bg4:#E9ECEF;
@@ -14,11 +17,11 @@
   --text:#0F172A;--text2:#64748B;--text3:#94A3B8;--border:#E2E8F0;
   --shadow:0 1px 3px rgba(0,0,0,0.06),0 6px 16px rgba(0,0,0,0.05);
   --shadow-sm:0 1px 2px rgba(0,0,0,0.05);
-  --mono:'IBM Plex Mono',monospace;--sans:'Inter',-apple-system,'Segoe UI',sans-serif;
+  --mono:'JetBrains Mono','IBM Plex Mono',monospace;--sans:'Pretendard Variable','Pretendard','Noto Sans KR',-apple-system,'Segoe UI',sans-serif;
   --radius:12px;--radius-sm:8px;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13px;-webkit-font-smoothing:antialiased;}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;word-break:keep-all;}
 
 .app{display:flex;flex-direction:column;height:100vh;overflow:hidden;}
 
@@ -225,7 +228,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
 
 /* CodeMirror overrides */
 .cm-editor{height:100% !important;}
-.cm-scroller{overflow:auto !important;font-family:var(--mono) !important;font-size:13px !important;line-height:1.75 !important;}
+.cm-scroller{overflow:auto !important;font-family:var(--mono) !important;font-size:13.5px !important;line-height:1.8 !important;}
 .cm-focused{outline:none !important;}
 
 /* ── Drag handle (H) ── */
@@ -255,7 +258,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
 .rtable-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
 .rtable-title-text{font-size:9px;font-weight:700;color:var(--text3);
   font-family:var(--mono);letter-spacing:1px;text-transform:uppercase;}
-.rtable{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:16px;border-radius:8px;overflow:hidden;}
+.rtable{width:100%;border-collapse:collapse;font-size:12.5px;margin-bottom:16px;border-radius:8px;overflow:hidden;}
 .rtable th{position:sticky;top:0;background:var(--bg3);color:var(--text2);
   padding:8px 14px;text-align:left;border-bottom:2px solid var(--border);
   font-family:var(--mono);font-size:11px;white-space:nowrap;z-index:2;
