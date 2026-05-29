@@ -111,6 +111,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
   border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;border:1px solid var(--border);}
 .tab-bar{display:flex;align-items:center;padding:0 14px;height:48px;flex-shrink:0;
   background:var(--bg3);border-bottom:1px solid var(--border);gap:2px;}
+.editor-label{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;
+  color:var(--primary);font-family:var(--sans);padding:0 6px;}
 .tab{display:flex;align-items:center;gap:6px;padding:0 14px;height:48px;border:none;
   background:transparent;font-size:12px;color:var(--text2);cursor:pointer;
   border-bottom:2px solid transparent;transition:.12s;font-family:var(--sans);font-weight:500;}
@@ -492,6 +494,7 @@ kbd{background:var(--bg3);border:1px solid var(--border);border-bottom:2px solid
   <!-- 중: 에디터 + 결과 -->
   <main class="work" id="work">
     <div class="tab-bar">
+      <span class="editor-label"><i class="ti ti-terminal-2"></i> SQL 쿼리</span>
       <div class="tab-space"></div>
       <div class="history-wrap">
         <button class="btn-sm" id="btn-history" title="실행 이력"><i class="ti ti-history"></i></button>
