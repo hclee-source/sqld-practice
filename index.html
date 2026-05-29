@@ -92,8 +92,16 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
 .tbl-hd-name:hover{color:var(--primary);}
 .tbl-rows-badge{font-size:9px;color:var(--text3);background:var(--bg4);
   border-radius:9px;padding:1px 6px;flex-shrink:0;font-family:var(--sans);}
-.chevron{font-size:11px;transition:transform .2s;color:var(--text3);flex-shrink:0;}
-.tbl-hd.open .chevron{transform:rotate(90deg);color:var(--primary);}
+.chevron{font-size:14px;transition:transform .22s;color:var(--text3);flex-shrink:0;}
+.tbl-hd.open .chevron{transform:rotate(180deg);color:var(--primary);}
+/* ERD 전용 버튼 행 */
+.erd-nav-btn{display:flex;align-items:center;gap:8px;width:100%;
+  padding:7px 14px;background:rgba(56,139,253,0.06);
+  border:none;border-bottom:1px solid var(--border);
+  color:var(--blue);font-size:11px;font-weight:700;cursor:pointer;
+  font-family:var(--sans);transition:.14s;flex-shrink:0;}
+.erd-nav-btn:hover{background:rgba(56,139,253,0.14);}
+.db-panel.collapsed .erd-nav-btn{display:none;}
 .tbl-cols{display:none;padding:2px 0 8px 32px;}
 .tbl-cols.open{display:block;}
 .col-item{display:flex;align-items:center;gap:5px;padding:3px 10px 3px 0;cursor:pointer;
@@ -544,13 +552,15 @@ kbd{background:var(--bg3);border:1px solid var(--border);border-bottom:2px solid
     <div class="db-panel-hd">
       <span class="db-panel-label">Schema</span>
       <input class="schema-search" id="schema-search" placeholder="검색..." type="text">
-      <button class="btn-panel-toggle" id="btn-erd" title="ERD 다이어그램 보기" style="color:var(--blue);">
-        <i class="ti ti-sitemap"></i>
-      </button>
       <button class="btn-panel-toggle" id="btn-toggle-left" title="패널 접기">
         <i class="ti ti-layout-sidebar-left-collapse"></i>
       </button>
     </div>
+    <button class="erd-nav-btn" id="btn-erd">
+      <i class="ti ti-sitemap" style="font-size:13px;"></i>
+      ERD 다이어그램 보기
+      <i class="ti ti-arrow-right" style="margin-left:auto;font-size:11px;opacity:.5;"></i>
+    </button>
     <div class="db-scroll" id="db-scroll"></div>
     <a class="book-promo" href="https://goldenrabbit.co.kr/books/9791194383710" target="_blank" rel="noopener">
       <img class="book-promo-img" src="https://lh3.googleusercontent.com/d/1UnYyuUHu8UNAIeTo6jo3KWubBONNBAls=w200" alt="2026 빠르게 따는 SQLD 표지">
@@ -1483,7 +1493,7 @@ function renderDBPanel() {
           <span class="tbl-hd-name" data-tbl="${t.name}" title="클릭: SELECT * FROM ${t.name}">${t.name}</span>
           <span class="tbl-rows-badge">${t.rows}</span>
           <button class="tbl-info-btn" data-info="${t.name}" title="상세 스키마 보기"><i class="ti ti-info-circle" style="font-size:13px;"></i></button>
-          <i class="ti ti-chevron-right chevron"></i>
+          <i class="ti ti-chevron-down chevron"></i>
         </div>
         <div class="tbl-cols${q ? ' open' : ''}">${colsHtml}</div>
       </div>`;
@@ -1507,7 +1517,7 @@ function refreshDynamicSchema() {
         <span class="tbl-hd-name" data-tbl="${name}" title="클릭: SELECT * FROM ${name}">${name}</span>
         <span class="tbl-rows-badge" style="background:rgba(59,130,246,0.08);color:var(--blue);">${type === 'view' ? 'VIEW' : 'TABLE'}</span>
         <button class="tbl-info-btn" data-info="${name}" title="상세 스키마 보기"><i class="ti ti-info-circle" style="font-size:13px;"></i></button>
-        <i class="ti ti-chevron-right chevron"></i>
+        <i class="ti ti-chevron-down chevron"></i>
       </div>
       <div class="tbl-cols"></div>`;
     });
