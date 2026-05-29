@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>골든래빗 SQLD SQL 실습 환경</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/tabler-icons.min.css">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -282,7 +282,7 @@ kbd{background:var(--bg3);border:1px solid var(--border);border-bottom:2px solid
   flex-direction:column;border-radius:var(--radius);box-shadow:var(--shadow);
   overflow:hidden;border:1px solid var(--border);transition:width .22s ease;}
 .ex-panel-wrap.collapsed{width:28px;border:1px solid var(--border);box-shadow:none;}
-.ex-panel-wrap.collapsed .ex-hd,.ex-panel-wrap.collapsed .ex-filter,.ex-panel-wrap.collapsed .ex-scroll{display:none;}
+.ex-panel-wrap.collapsed .ex-hd,.ex-panel-wrap.collapsed .ex-search-wrap,.ex-panel-wrap.collapsed .ex-filter,.ex-panel-wrap.collapsed .ex-scroll{display:none;}
 .ex-hd{display:flex;align-items:center;padding:13px 14px;flex-shrink:0;
   border-bottom:1px solid var(--border);gap:8px;
   background:linear-gradient(160deg,var(--bg3) 0%,rgba(240,75,35,0.03) 100%);}
@@ -344,23 +344,28 @@ kbd{background:var(--bg3);border:1px solid var(--border);border-bottom:2px solid
   color:#92400E;background:rgba(217,119,6,0.07);border:1px solid rgba(217,119,6,0.25);line-height:1.65;}
 .oracle-unsupported-hint strong{font-weight:700;}
 /* ── 도서 프로모 카드 ── */
-.book-promo{display:flex;align-items:center;gap:11px;padding:12px 14px;
-  border-top:1px solid var(--border);text-decoration:none;background:var(--bg3);
-  flex-shrink:0;transition:.15s;cursor:pointer;}
-.book-promo:hover{background:rgba(240,75,35,0.05);}
-.book-promo:hover .book-promo-cta{color:var(--primary2);}
+.book-promo{display:flex;flex-direction:column;align-items:center;gap:12px;padding:18px 16px 16px;
+  border-top:2px solid rgba(240,75,35,0.12);text-decoration:none;
+  background:linear-gradient(160deg,#FFF9F8 0%,var(--bg3) 100%);
+  flex-shrink:0;transition:.18s;text-align:center;}
+.book-promo:hover{background:linear-gradient(160deg,rgba(240,75,35,0.07) 0%,rgba(240,75,35,0.02) 100%);}
 .db-panel.collapsed .book-promo{display:none;}
-.book-promo-img{width:46px;height:64px;object-fit:cover;border-radius:5px;flex-shrink:0;
-  box-shadow:0 2px 10px rgba(0,0,0,0.18);}
-.book-promo-info{flex:1;min-width:0;}
-.book-promo-badge{font-size:8px;font-weight:800;color:var(--primary);letter-spacing:1.4px;
-  text-transform:uppercase;margin-bottom:4px;}
-.book-promo-title{font-size:11.5px;font-weight:700;color:var(--text);line-height:1.35;
-  margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.book-promo-author{font-size:10px;color:var(--text3);margin-bottom:5px;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.book-promo-cta{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;
-  color:var(--primary);transition:.13s;}
+.book-promo-img{width:88px;height:124px;object-fit:cover;border-radius:7px;flex-shrink:0;
+  box-shadow:0 6px 20px rgba(0,0,0,0.22),0 2px 6px rgba(0,0,0,0.1);
+  transition:.18s;}
+.book-promo:hover .book-promo-img{transform:translateY(-2px);box-shadow:0 10px 28px rgba(0,0,0,0.26),0 3px 8px rgba(0,0,0,0.12);}
+.book-promo-info{width:100%;}
+.book-promo-badge{font-size:9px;font-weight:800;color:var(--primary);letter-spacing:1.6px;
+  text-transform:uppercase;margin-bottom:6px;}
+.book-promo-title{font-size:13px;font-weight:700;color:var(--text);line-height:1.4;
+  margin-bottom:4px;}
+.book-promo-author{font-size:11px;color:var(--text3);margin-bottom:12px;line-height:1.5;}
+.book-promo-cta{display:inline-flex;align-items:center;justify-content:center;gap:5px;
+  font-size:11.5px;font-weight:700;color:#fff;font-family:var(--sans);
+  background:linear-gradient(135deg,var(--primary) 0%,#FF5C35 100%);
+  border-radius:9px;padding:8px 0;width:100%;transition:.16s;
+  box-shadow:0 2px 10px rgba(240,75,35,0.35);}
+.book-promo:hover .book-promo-cta{box-shadow:0 4px 16px rgba(240,75,35,0.48);transform:translateY(-1px);}
 /* ── 진행도 초기화 버튼 ── */
 .btn-progress-reset{display:flex;align-items:center;gap:4px;font-size:10px;font-weight:600;
   color:var(--text3);background:transparent;border:1px solid transparent;border-radius:6px;
@@ -400,6 +405,42 @@ kbd{background:var(--bg3);border:1px solid var(--border);border-bottom:2px solid
   border-radius:8px;font-size:13.5px;color:#1D4ED8;line-height:1.7;}
 .guide-warning{padding:12px 16px;background:rgba(217,119,6,0.06);border:1px solid rgba(217,119,6,0.25);
   border-radius:8px;font-size:13.5px;color:#92400E;line-height:1.7;}
+/* ── 예제 검색 ── */
+.ex-search-wrap{padding:8px 10px 8px;flex-shrink:0;position:relative;}
+.ex-search{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:7px;
+  padding:6px 10px 6px 30px;font-size:11px;color:var(--text);outline:none;transition:.15s;
+  font-family:var(--sans);}
+.ex-search::placeholder{color:var(--text3);}
+.ex-search:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(240,75,35,0.1);}
+.ex-search-wrap i{position:absolute;left:19px;top:50%;transform:translateY(-50%);
+  font-size:12px;color:var(--text3);pointer-events:none;}
+/* ── 연습 모드 ── */
+.btn-practice{display:flex;align-items:center;gap:4px;font-size:10px;font-weight:600;
+  color:var(--text3);background:transparent;border:1px solid transparent;border-radius:6px;
+  padding:3px 7px;cursor:pointer;transition:.13s;font-family:var(--sans);white-space:nowrap;}
+.btn-practice:hover{color:var(--blue);border-color:rgba(59,130,246,0.3);background:rgba(59,130,246,0.06);}
+.btn-practice.active{color:var(--blue);border-color:rgba(59,130,246,0.35);
+  background:rgba(59,130,246,0.1);font-weight:700;}
+/* ── 쿼리 히스토리 ── */
+.history-wrap{position:relative;}
+.history-panel{position:fixed;width:360px;max-height:380px;
+  overflow-y:auto;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);
+  box-shadow:var(--shadow);z-index:2000;display:none;}
+.history-panel.show{display:block;}
+.history-panel::-webkit-scrollbar{width:3px;}
+.history-panel::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px;}
+.history-hd{display:flex;align-items:center;justify-content:space-between;
+  padding:8px 12px;border-bottom:1px solid var(--border);background:var(--bg3);}
+.history-hd-label{font-size:9px;font-weight:800;color:var(--text3);letter-spacing:1.4px;text-transform:uppercase;}
+.history-clear{font-size:10px;color:var(--text3);background:none;border:none;cursor:pointer;
+  padding:2px 5px;border-radius:4px;transition:.12s;}
+.history-clear:hover{color:#DC2626;background:rgba(220,38,38,0.07);}
+.history-item{padding:8px 12px;cursor:pointer;border-bottom:1px solid var(--border);transition:.1s;}
+.history-item:last-child{border-bottom:none;}
+.history-item:hover{background:var(--bg3);}
+.history-item-sql{font-size:11px;font-family:var(--mono);color:var(--text2);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.history-empty{padding:20px;text-align:center;color:var(--text3);font-size:12px;}
 </style>
 </head>
 <body>
@@ -440,7 +481,7 @@ kbd{background:var(--bg3);border:1px solid var(--border);border-bottom:2px solid
         <div class="book-promo-badge">교재 안내</div>
         <div class="book-promo-title">2026 빠르게 따는 SQLD</div>
         <div class="book-promo-author">이유성 · 조영훈 · 임한울</div>
-        <div class="book-promo-cta"><i class="ti ti-shopping-cart" style="font-size:11px;"></i> 구매하기</div>
+        <div class="book-promo-cta"><i class="ti ti-shopping-cart" style="font-size:13px;"></i> 지금 구매하기</div>
       </div>
     </a>
   </aside>
@@ -458,6 +499,10 @@ kbd{background:var(--bg3);border:1px solid var(--border);border-bottom:2px solid
         <i class="ti ti-table-plus"></i> DDL / DML
       </button>
       <div class="tab-space"></div>
+      <div class="history-wrap">
+        <button class="btn-sm" id="btn-history" title="실행 이력"><i class="ti ti-history"></i></button>
+        <div class="history-panel" id="history-panel"></div>
+      </div>
       <button class="btn-sm" id="btn-clear"><i class="ti ti-eraser"></i> 초기화</button>
       <button class="btn-run" id="btn-run">
         <i class="ti ti-player-play-filled icon"></i>
@@ -501,12 +546,19 @@ kbd{background:var(--bg3);border:1px solid var(--border);border-bottom:2px solid
       <i class="ti ti-book-2" style="color:var(--primary);font-size:15px;"></i>
       <span class="ex-hd-title">학습 예제 가이드</span>
       <span class="ex-progress" id="ex-progress">0 / 0</span>
+      <button class="btn-practice" id="btn-practice" title="연습 모드: 예제 클릭 시 SQL을 로드하지 않고 직접 작성">
+        <i class="ti ti-pencil"></i> 연습
+      </button>
       <button class="btn-progress-reset" id="btn-progress-reset">
         <i class="ti ti-rotate-clockwise"></i> 초기화
       </button>
       <button class="btn-panel-toggle-r" id="btn-toggle-right" title="패널 접기">
         <i class="ti ti-layout-sidebar-right-collapse"></i>
       </button>
+    </div>
+    <div class="ex-search-wrap">
+      <i class="ti ti-search"></i>
+      <input class="ex-search" id="ex-search" placeholder="예제 검색..." type="text" autocomplete="off">
     </div>
     <div class="ex-filter" id="ex-filter"></div>
     <div class="ex-scroll" id="ex-panel"></div>
@@ -595,7 +647,7 @@ kbd{background:var(--bg3);border:1px solid var(--border);border-bottom:2px solid
           <div class="guide-layout-item">
             <div class="guide-layout-label">③</div>
             <div class="guide-layout-name">예제 패널</div>
-            <div class="guide-layout-desc">56개 예제<br>힌트·해설·완료 체크</div>
+            <div class="guide-layout-desc">61개 예제<br>힌트·해설·완료 체크</div>
           </div>
         </div>
         <ul class="guide-list">
@@ -640,7 +692,7 @@ kbd{background:var(--bg3);border:1px solid var(--border);border-bottom:2px solid
       <div>
         <div class="modal-section-title">4 · 예제 패널 100% 활용하기</div>
         <ul class="guide-list">
-          <li>총 <strong>56개 예제</strong> / 16개 카테고리 (SELECT, JOIN, 서브쿼리, 윈도우 함수, DML, DDL 등)</li>
+          <li>총 <strong>61개 예제</strong> / 18개 카테고리 (SELECT, JOIN, 서브쿼리, 윈도우 함수, DML, DDL 등)</li>
           <li>상단 <strong>카테고리 탭</strong>으로 원하는 주제만 필터링</li>
           <li>예제 카드 클릭 → 해당 SQL이 <strong>에디터에 자동 로드</strong></li>
           <li><button class="ex-hint-btn" style="pointer-events:none;cursor:default;vertical-align:middle;">💡 힌트</button> : 풀이 방향 키워드 제공 (먼저 스스로 풀어보세요!)</li>
@@ -858,6 +910,9 @@ const EXAMPLES = [
     {t:'ALL / ANY',d:'모든/하나의 값보다 큰 사원',sql:`-- ALL: 모든 SALESMAN 급여보다 높은 사원\nSELECT ENAME, SAL FROM EMP\nWHERE SAL > ALL (SELECT SAL FROM EMP WHERE JOB='SALESMAN');\n\n-- ANY: ANALYST 중 한 명보다 급여가 높은 사원\nSELECT ENAME, SAL FROM EMP\nWHERE SAL > ANY (SELECT SAL FROM EMP WHERE JOB='ANALYST');`,
      hint:`ALL: 서브쿼리의 모든 값보다 크거나 작아야 함 / ANY: 서브쿼리의 값 중 하나라도 만족하면 됩니다.`,
      solution:`> ALL (서브쿼리)는 서브쿼리 MAX보다 큰 경우, > ANY는 서브쿼리 MIN보다 큰 경우와 동일합니다. SQLD 시험에서 헷갈리기 쉬운 개념이므로 주의하세요.`},
+    {t:'NOT EXISTS',d:'주문 없는 상품 조회 — EXISTS 부정형',sql:`SELECT P.PROD_ID, P.PROD_NAME, P.CATEGORY, P.PRICE\nFROM PRODUCTS P\nWHERE NOT EXISTS (\n  SELECT 1 FROM ORDERS O WHERE O.PROD_ID = P.PROD_ID\n)\nORDER BY P.CATEGORY, P.PROD_ID;`,
+     hint:`NOT EXISTS(서브쿼리) — 서브쿼리에 결과가 없으면 TRUE. EXISTS의 반대입니다. NOT IN과 달리 NULL 행이 있어도 안전합니다.`,
+     solution:`NOT EXISTS는 주문이 하나도 없는 상품을 찾습니다. NOT IN(서브쿼리)은 서브쿼리에 NULL이 하나라도 있으면 전체 결과가 0행이 되는 함정이 있어, NOT EXISTS가 더 안전합니다. SQLD 시험에서 EXISTS/NOT EXISTS·IN/NOT IN의 차이가 자주 출제됩니다.`},
   ]},
   {g:'그룹 함수',items:[
     {t:'ROLLUP (소계+합계)',d:'부서·직무별 급여 소계 자동 생성',sql:`SELECT DEPTNO, JOB, COUNT(*) AS CNT, SUM(SAL) AS TOTAL_SAL\nFROM EMP\nGROUP BY ROLLUP(DEPTNO, JOB)\nORDER BY DEPTNO NULLS LAST, JOB NULLS LAST;`,
@@ -889,6 +944,9 @@ const EXAMPLES = [
     {t:'FIRST_VALUE / LAST_VALUE',d:'부서 내 첫/마지막 입사자',sql:`SELECT DEPTNO, ENAME, HIREDATE,\n       FIRST_VALUE(ENAME) OVER (PARTITION BY DEPTNO ORDER BY HIREDATE) AS FIRST_EMP,\n       LAST_VALUE(ENAME)  OVER (\n         PARTITION BY DEPTNO ORDER BY HIREDATE\n         ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING\n       ) AS LAST_EMP\nFROM EMP ORDER BY DEPTNO, HIREDATE;`,
      hint:`FIRST_VALUE — 파티션 내 첫 번째 값, LAST_VALUE — 마지막 값. LAST_VALUE는 기본 프레임이 현재 행까지이므로 UNBOUNDED FOLLOWING이 필요합니다.`,
      solution:`LAST_VALUE는 기본적으로 현재 행까지만 프레임을 잡기 때문에 ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING을 명시해야 파티션 전체의 마지막 값을 올바르게 가져옵니다.`},
+    {t:'NTILE (분위 분할)',d:'급여를 4분위로 나누기',sql:`SELECT ENAME, SAL,\n       NTILE(4) OVER (ORDER BY SAL DESC) AS QUARTILE\nFROM EMP\nORDER BY SAL DESC;`,
+     hint:`NTILE(N) OVER (ORDER BY ...) — 전체 행을 N등분합니다. 상위 25%가 1분위, 다음 25%가 2분위...`,
+     solution:`NTILE(4)는 급여 순으로 전체 사원을 4분위로 나눕니다. 행 수가 N의 배수가 아니면 앞 그룹부터 1행씩 더 배분됩니다. RANK/DENSE_RANK/ROW_NUMBER/NTILE 네 함수의 차이를 묶어서 이해하세요. SQLD에서 모두 출제 가능합니다.`},
   ]},
   {g:'집합 연산자',items:[
     {t:'UNION (합집합)',d:'컴공 전공 OR 1학년 학번',sql:`SELECT STU_ID FROM STUDENTS WHERE MAJOR = '컴퓨터공학'\nUNION\nSELECT STU_ID FROM STUDENTS WHERE YEAR = 1;`,
@@ -905,6 +963,14 @@ const EXAMPLES = [
     {t:'VIEW 생성 및 조회',d:'부서별 사원 현황 가상 테이블',sql:`CREATE VIEW IF NOT EXISTS VW_DEPT_SUMMARY AS\n  SELECT D.DEPTNO, D.DNAME, D.LOC,\n         COUNT(E.EMPNO)      AS EMP_CNT,\n         ROUND(AVG(E.SAL),0) AS AVG_SAL,\n         MAX(E.SAL)           AS MAX_SAL\n  FROM DEPT D LEFT JOIN EMP E ON D.DEPTNO = E.DEPTNO\n  GROUP BY D.DEPTNO, D.DNAME, D.LOC;\n\nSELECT * FROM VW_DEPT_SUMMARY ORDER BY AVG_SAL DESC;`,
      hint:`CREATE VIEW 뷰이름 AS SELECT ... — 자주 사용하는 복잡한 쿼리를 뷰로 저장해 테이블처럼 사용합니다.`,
      solution:`CREATE VIEW IF NOT EXISTS로 중복 에러를 방지합니다. 뷰는 데이터를 저장하지 않고 쿼리를 저장합니다. SELECT * FROM VW_DEPT_SUMMARY처럼 조회할 때마다 내부 쿼리가 실행됩니다.`},
+  ]},
+  {g:'CTE (WITH)',items:[
+    {t:'WITH 기본 CTE',d:'공통 테이블 표현식 — 재사용 가능한 서브쿼리',sql:`WITH HIGH_SAL AS (\n  SELECT DEPTNO, ENAME, SAL\n  FROM EMP\n  WHERE SAL >= 2000\n)\nSELECT H.DEPTNO, D.DNAME, H.ENAME, H.SAL\nFROM HIGH_SAL H\nJOIN DEPT D ON H.DEPTNO = D.DEPTNO\nORDER BY H.SAL DESC;`,
+     hint:`WITH CTE명 AS (서브쿼리) — 복잡한 서브쿼리에 이름을 붙여 메인 쿼리에서 테이블처럼 사용합니다.`,
+     solution:`WITH HIGH_SAL AS (...) — 급여 2000 이상 사원을 CTE로 정의하고 DEPT와 조인합니다. CTE는 인라인 뷰보다 가독성이 높고, 같은 서브쿼리를 여러 번 참조해야 할 때 유리합니다. SQLD 최근 시험에서 출제 비중이 높아지고 있습니다.`},
+    {t:'WITH 다중 CTE',d:'두 CTE를 정의해 순차 연결',sql:`WITH DEPT_AVG AS (\n  SELECT DEPTNO, ROUND(AVG(SAL),0) AS AVG_SAL\n  FROM EMP GROUP BY DEPTNO\n),\nDEPT_INFO AS (\n  SELECT D.DEPTNO, D.DNAME, A.AVG_SAL\n  FROM DEPT D JOIN DEPT_AVG A ON D.DEPTNO = A.DEPTNO\n)\nSELECT * FROM DEPT_INFO\nORDER BY AVG_SAL DESC;`,
+     hint:`WITH A AS (...), B AS (...) — 쉼표로 구분해 여러 CTE를 정의합니다. 뒤 CTE에서 앞 CTE를 참조할 수 있습니다.`,
+     solution:`DEPT_AVG(부서별 평균 급여)와 DEPT_INFO(부서 정보 결합)를 순차 정의합니다. 복잡한 다단계 집계 로직을 가독성 있게 분리할 수 있어 실무와 시험 모두에서 유용한 패턴입니다.`},
   ]},
   {g:'계층형 질의',items:[
     {t:'루트 노드 조회',d:'최상위 관리자 (PID IS NULL)',sql:`SELECT NAME, POS FROM ORG_CHART WHERE PID IS NULL;`,
@@ -979,19 +1045,68 @@ const EXAMPLES = [
 /* ════════════════════════════════════════════════════════
    ORACLE → SQLITE 자동 변환기
 ════════════════════════════════════════════════════════ */
+
+// 중첩 괄호를 고려한 인수 분리 헬퍼
+function splitArgs(str) {
+  const parts = [];
+  let depth = 0, cur = '', inStr = false, strChar = '';
+  for (let i = 0; i < str.length; i++) {
+    const ch = str[i];
+    if (inStr) {
+      cur += ch;
+      if (ch === strChar) inStr = false;
+    } else if (ch === "'" || ch === '"') {
+      inStr = true; strChar = ch; cur += ch;
+    } else if (ch === '(') { depth++; cur += ch; }
+    else if (ch === ')') { depth--; cur += ch; }
+    else if (ch === ',' && depth === 0) { parts.push(cur.trim()); cur = ''; }
+    else { cur += ch; }
+  }
+  if (cur.trim()) parts.push(cur.trim());
+  return parts;
+}
+
+// 중첩 괄호를 추적해 함수 호출 전체 범위를 찾아 변환
+function replaceFunc(sql, funcRE, replacer) {
+  let result = '';
+  let i = 0;
+  while (i < sql.length) {
+    const m = sql.slice(i).match(funcRE);
+    if (!m) { result += sql.slice(i); break; }
+    const matchStart = i + m.index;
+    result += sql.slice(i, matchStart);
+    const openPos = matchStart + m[0].length - 1;
+    let depth = 1, j = openPos + 1;
+    while (j < sql.length && depth > 0) {
+      const ch = sql[j];
+      if (ch === '(') depth++;
+      else if (ch === ')') depth--;
+      j++;
+    }
+    const inner = sql.slice(openPos + 1, j - 1);
+    const converted = replacer(inner, sql.slice(matchStart, j));
+    result += converted;
+    i = j;
+  }
+  return result;
+}
 const DEFAULT_QUERY = '-- SQL을 입력하고 Ctrl+Enter로 실행하세요\nSELECT * FROM EMP;';
 
 const ORACLE_UNSUPPORTED = [
-  { re: /\bCONNECT\s+BY\b/i,  name: 'CONNECT BY' },
-  { re: /\bSTART\s+WITH\b/i,  name: 'START WITH' },
-  { re: /\bDECODE\s*\(/i,     name: 'DECODE()' },
-  { re: /\bNVL2\s*\(/i,       name: 'NVL2()' },
-  { re: /\bPIVOT\s*\(/i,      name: 'PIVOT()' },
-  { re: /\bUNPIVOT\b/i,       name: 'UNPIVOT' },
-  { re: /\bLISTAGG\s*\(/i,    name: 'LISTAGG()' },
-  { re: /\bWM_CONCAT\s*\(/i,  name: 'WM_CONCAT()' },
-  { re: /\bFROM\s+DUAL\b/i,   name: 'DUAL' },
-  { re: /\bROWID\b/i,         name: 'ROWID' },
+  { re: /\bCONNECT\s+BY\b/i,       name: 'CONNECT BY' },
+  { re: /\bSTART\s+WITH\b/i,       name: 'START WITH' },
+  { re: /\bPIVOT\s*\(/i,           name: 'PIVOT()' },
+  { re: /\bUNPIVOT\b/i,            name: 'UNPIVOT' },
+  { re: /\bLISTAGG\s*\(/i,         name: 'LISTAGG()' },
+  { re: /\bWM_CONCAT\s*\(/i,       name: 'WM_CONCAT()' },
+  { re: /\bFROM\s+DUAL\b/i,        name: 'DUAL' },
+  { re: /\bROWID\b/i,              name: 'ROWID' },
+  { re: /\bLPAD\s*\(/i,            name: 'LPAD()' },
+  { re: /\bRPAD\s*\(/i,            name: 'RPAD()' },
+  { re: /\bMONTHS_BETWEEN\s*\(/i,  name: 'MONTHS_BETWEEN()' },
+  { re: /\bLAST_DAY\s*\(/i,        name: 'LAST_DAY()' },
+  { re: /\bNEXT_DAY\s*\(/i,        name: 'NEXT_DAY()' },
+  { re: /\bTRUNC\s*\(/i,           name: 'TRUNC()' },
 ];
 function detectUnsupportedOracle(sql) {
   return ORACLE_UNSUPPORTED.filter(u => u.re.test(sql)).map(u => u.name);
@@ -1000,6 +1115,44 @@ function detectUnsupportedOracle(sql) {
 function transpileOracle(sql) {
   let out = sql;
   const changes = [];
+
+  // DECODE(expr, v1, r1, v2, r2, ..., default) → CASE expr WHEN v1 THEN r1 ...
+  if (/\bDECODE\s*\(/i.test(out)) {
+    const before = out;
+    out = replaceFunc(out, /\bDECODE\s*\(/i, (inner, original) => {
+      const parts = splitArgs(inner);
+      if (parts.length < 3) return original;
+      let expr = `CASE ${parts[0]}`;
+      let k = 1;
+      while (k + 1 < parts.length) { expr += ` WHEN ${parts[k]} THEN ${parts[k+1]}`; k += 2; }
+      if (k < parts.length) expr += ` ELSE ${parts[k]}`;
+      return expr + ' END';
+    });
+    if (out !== before) changes.push('DECODE() → CASE WHEN');
+  }
+
+  // NVL2(a, b, c) → CASE WHEN a IS NOT NULL THEN b ELSE c END
+  if (/\bNVL2\s*\(/i.test(out)) {
+    const before = out;
+    out = replaceFunc(out, /\bNVL2\s*\(/i, (inner, original) => {
+      const parts = splitArgs(inner);
+      if (parts.length !== 3) return original;
+      return `CASE WHEN ${parts[0]} IS NOT NULL THEN ${parts[1]} ELSE ${parts[2]} END`;
+    });
+    if (out !== before) changes.push('NVL2() → CASE WHEN');
+  }
+
+  // TRUNC(n) → FLOOR(n)  (숫자 절삭 — 날짜 TRUNC는 미지원 안내로 처리)
+  if (/\bTRUNC\s*\(/i.test(out)) {
+    const before = out;
+    out = replaceFunc(out, /\bTRUNC\s*\(/i, (inner, original) => {
+      const parts = splitArgs(inner);
+      if (parts.length === 1) return `FLOOR(${parts[0]})`;
+      if (parts.length === 2 && parts[1].trim() === '0') return `FLOOR(${parts[0]})`;
+      return original;
+    });
+    if (out !== before) changes.push('TRUNC() → FLOOR()');
+  }
 
   // NVL(x, y) → IFNULL(x, y)
   if (/\bNVL\s*\(/i.test(out)) {
@@ -1054,17 +1207,30 @@ function transpileOracle(sql) {
     changes.push('TO_DATE() → date()');
   }
 
-  // WHERE ROWNUM <= N → LIMIT N  /  WHERE ROWNUM < N → LIMIT N-1
-  const leMatch = out.match(/WHERE\s+ROWNUM\s*<=\s*(\d+)/i);
-  const ltMatch = out.match(/WHERE\s+ROWNUM\s*<\s*(\d+)/i);
-  if (leMatch) {
-    const n = parseInt(leMatch[1]);
-    out = out.replace(/WHERE\s+ROWNUM\s*<=\s*\d+/i, '').replace(/;?\s*$/, '') + ` LIMIT ${n}`;
-    changes.push(`ROWNUM <= ${n} → LIMIT ${n}`);
-  } else if (ltMatch) {
-    const n = parseInt(ltMatch[1]) - 1;
-    out = out.replace(/WHERE\s+ROWNUM\s*<\s*\d+/i, '').replace(/;?\s*$/, '') + ` LIMIT ${n}`;
-    changes.push(`ROWNUM < ${parseInt(ltMatch[1])} → LIMIT ${n}`);
+  // WHERE ROWNUM <= N / < N  →  LIMIT N
+  // Bug 1 fix: compound WHERE (e.g. WHERE ROWNUM <= 5 AND DEPTNO = 10) 조건 보존
+  // Bug 2 fix: 다중 쿼리에서 ROWNUM 포함 문장에만 LIMIT 삽입
+  {
+    const rowRE = /\bWHERE\s+ROWNUM\s*(<=?)(\s*\d+)|\bAND\s+ROWNUM\s*(<=?)(\s*\d+)/i;
+    const rowM = out.match(rowRE);
+    if (rowM) {
+      const op = (rowM[1] || rowM[3] || '').trim();
+      const rawN = parseInt(rowM[2] || rowM[4]);
+      const limit = op === '<=' ? rawN : rawN - 1;
+      const pos = out.search(rowRE);
+      const semiIdx = out.indexOf(';', pos);
+      const stmtEnd = semiIdx >= 0 ? semiIdx : out.length;
+      let stmt = out.slice(0, stmtEnd);
+      const rest = out.slice(stmtEnd);
+      // Case A: WHERE ROWNUM op N AND rest  →  WHERE rest
+      stmt = stmt.replace(/\bWHERE\s+ROWNUM\s*<=?\s*\d+\s+AND\s+/i, 'WHERE ');
+      // Case B: AND ROWNUM op N  →  제거
+      stmt = stmt.replace(/\s+AND\s+ROWNUM\s*<=?\s*\d+\b/i, '');
+      // Case C: WHERE ROWNUM op N (단독)  →  제거
+      stmt = stmt.replace(/\bWHERE\s+ROWNUM\s*<=?\s*\d+\b/i, '');
+      out = stmt.trimEnd() + ` LIMIT ${limit}` + rest;
+      changes.push(`ROWNUM ${op} ${rawN} → LIMIT ${limit}`);
+    }
   }
 
   return { sql: out.trim(), changes };
@@ -1080,9 +1246,12 @@ let editorView = null;
 let saveTimer = null;
 let schemaFilter = '';
 let catFilter = 'ALL';
+let exSearch = '';
+let practiceMode = false;
+let queryHistory = JSON.parse(localStorage.getItem('sqld-history') || '[]');
 let completed = new Set(JSON.parse(localStorage.getItem('sqld-done') || '[]'));
 let lastResultData = null;
-let sortCol = null, sortDir = 1;
+let sortState = {};  // { resultIdx: { col: null, dir: 1 } }
 
 /* ════════════════════════════════════════════════════════
    UTILS
@@ -1093,6 +1262,27 @@ function toast(msg, ms = 2000) {
   const el = document.getElementById('toast');
   el.textContent = msg; el.classList.add('show');
   setTimeout(() => el.classList.remove('show'), ms);
+}
+
+function friendlyError(msg) {
+  const rules = [
+    [/no such table:\s*(\S+)/i,          m => `테이블 <b>'${m[1].toUpperCase()}'</b> 이(가) 존재하지 않습니다 — 테이블명 철자·대소문자를 확인하세요`],
+    [/no such column:\s*(\S+)/i,         m => `컬럼 <b>'${m[1]}'</b> 이(가) 존재하지 않습니다 — 컬럼명 확인 또는 테이블 별칭 지정 필요`],
+    [/near "([^"]+)":\s*syntax error/i,  m => `<b>'${esc(m[1])}'</b> 근처에 문법 오류 — 괄호 짝, 쉼표, 키워드 철자를 확인하세요`],
+    [/UNIQUE constraint failed:\s*(\S+)/i, m => `PK/UNIQUE 중복 오류 — <b>'${m[1]}'</b> 값이 이미 존재합니다`],
+    [/NOT NULL constraint failed:\s*(\S+)/i, m => `NOT NULL 위반 — <b>'${m[1]}'</b> 컬럼에 NULL 입력 불가`],
+    [/FOREIGN KEY constraint failed/i,   () => `FK 제약 위반 — 참조 테이블에 해당 값이 없습니다`],
+    [/ambiguous column name:\s*(\S+)/i,  m => `컬럼명 <b>'${m[1]}'</b> 이(가) 여러 테이블에 중복 — 테이블 별칭으로 구분하세요 (예: T.${m[1]})`],
+    [/no such function:\s*(\S+)/i,       m => `함수 <b>'${m[1]}()'</b> 은(는) SQLite 미지원 — Oracle 전용 함수일 수 있습니다`],
+    [/misuse of aggregate/i,             () => `WHERE 절에 집계 함수 사용 불가 — HAVING 절을 사용하세요`],
+    [/result columns/i,                  () => `UNION/INTERSECT/EXCEPT 양쪽 컬럼 수가 다릅니다 — SELECT 컬럼 수를 맞추세요`],
+    [/no tables specified/i,             () => `FROM 절이 없습니다 — 조회할 테이블을 지정하세요`],
+  ];
+  for (const [re, fn] of rules) {
+    const m = msg.match(re);
+    if (m) return `${fn(m)}<br><span style="font-size:10px;color:var(--text3);opacity:.75;">${esc(msg)}</span>`;
+  }
+  return esc(msg);
 }
 
 /* ════════════════════════════════════════════════════════
@@ -1187,6 +1377,36 @@ function renderDBPanel() {
     }).join('');
 }
 
+function refreshDynamicSchema() {
+  if (!db) return;
+  try {
+    const schemaNames = new Set(SCHEMA.map(t => t.name));
+    const res = db.exec("SELECT name, type FROM sqlite_master WHERE type IN ('table','view') AND name NOT LIKE 'sqlite_%' ORDER BY type DESC, name ASC");
+    const dynEl = document.getElementById('db-dynamic');
+    if (!res.length) { dynEl?.remove(); return; }
+    const dynamic = res[0].values.filter(([name]) => !schemaNames.has(name));
+    if (!dynamic.length) { dynEl?.remove(); return; }
+    let html = '<div id="db-dynamic" style="border-top:2px solid var(--border);margin-top:4px;">';
+    html += '<div style="font-size:9px;font-weight:800;color:var(--text3);letter-spacing:1.4px;text-transform:uppercase;padding:10px 14px 4px;">사용자 생성 객체</div>';
+    dynamic.forEach(([name, type]) => {
+      html += `<div class="tbl-hd" data-tbl="${name}">
+        <i class="ti ${type === 'view' ? 'ti-eye' : 'ti-table-plus'}" style="font-size:12px;flex-shrink:0;color:var(--text3);"></i>
+        <span class="tbl-hd-name" data-tbl="${name}" title="클릭: SELECT * FROM ${name}">${name}</span>
+        <span class="tbl-rows-badge" style="background:rgba(59,130,246,0.08);color:var(--blue);">${type === 'view' ? 'VIEW' : 'TABLE'}</span>
+        <i class="ti ti-chevron-right chevron"></i>
+      </div>
+      <div class="tbl-cols"></div>`;
+    });
+    html += '</div>';
+    if (dynEl) {
+      dynEl.insertAdjacentHTML('afterend', html);
+      dynEl.remove();
+    } else {
+      document.getElementById('db-scroll').insertAdjacentHTML('beforeend', html);
+    }
+  } catch(_) {}
+}
+
 // Event delegation for schema panel
 document.getElementById('db-scroll').addEventListener('click', e => {
   const colItem = e.target.closest('.col-item');
@@ -1233,16 +1453,27 @@ function updateProgress() {
 }
 
 function renderExamples() {
+  const q = exSearch.toLowerCase();
   const groups = catFilter === 'ALL' ? EXAMPLES : EXAMPLES.filter(g => g.g === catFilter);
   let html = '';
   groups.forEach(g => {
+    const items = g.items.filter(item =>
+      !q ||
+      item.t.toLowerCase().includes(q) ||
+      item.d.toLowerCase().includes(q) ||
+      item.sql.toLowerCase().includes(q)
+    );
+    if (!items.length) return;
     html += `<div class="ex-group-title">${esc(g.g)}</div>`;
-    g.items.forEach(item => {
+    items.forEach(item => {
       const key = g.g + ':' + item.t;
       const done = completed.has(key);
+      const practiceLabel = practiceMode
+        ? `<span style="font-size:10px;color:var(--blue);background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);border-radius:4px;padding:1px 6px;margin-left:6px;">연습</span>`
+        : '';
       html += `<div class="ex-item${done ? ' done' : ''}" data-sql="${esc(item.sql)}" data-key="${esc(key)}">
         <div class="ex-item-body">
-          <div class="ex-item-title">${esc(item.t)}</div>
+          <div class="ex-item-title">${esc(item.t)}${practiceLabel}</div>
           <div class="ex-item-desc">${esc(item.d)}</div>
           <div class="ex-item-footer">
             <button class="ex-hint-btn" data-hint="${esc(item.hint || '')}">💡 힌트</button>
@@ -1257,7 +1488,9 @@ function renderExamples() {
       </div>`;
     });
   });
-  if (!html) html = '<div class="ex-empty">예제가 없습니다</div>';
+  if (!html) {
+    html = `<div class="ex-empty">${q ? `'${esc(q)}' 검색 결과가 없습니다` : '예제가 없습니다'}</div>`;
+  }
   document.getElementById('ex-panel').innerHTML = html;
   updateProgress();
 }
@@ -1302,8 +1535,14 @@ document.getElementById('ex-panel').addEventListener('click', e => {
     if (cur && cur !== DEFAULT_QUERY.trim()) {
       if (!confirm('현재 작성 중인 SQL이 있습니다. 예제로 교체하겠습니까?')) return;
     }
-    setEditorSQL(item.dataset.sql);
-    switchTab('query');
+    if (practiceMode) {
+      setEditorSQL('');
+      switchTab('query');
+      toast('연습 모드: SQL을 직접 작성해보세요!');
+    } else {
+      setEditorSQL(item.dataset.sql);
+      switchTab('query');
+    }
   }
 });
 
@@ -1410,18 +1649,19 @@ function renderVal(v) {
 }
 
 function renderResultTable(cols, rows, idx) {
-  const sortedRows = sortCol !== null
+  const ss = sortState[idx] || { col: null, dir: 1 };
+  const sortedRows = ss.col !== null
     ? [...rows].sort((a, b) => {
-        const av = a[sortCol], bv = b[sortCol];
+        const av = a[ss.col], bv = b[ss.col];
         if (av === null) return 1; if (bv === null) return -1;
-        return (av < bv ? -1 : av > bv ? 1 : 0) * sortDir;
+        return (av < bv ? -1 : av > bv ? 1 : 0) * ss.dir;
       })
     : rows;
 
   const headers = cols.map((c, i) => {
     let cls = '';
-    if (sortCol === i) cls = sortDir === 1 ? ' sorted-asc' : ' sorted-desc';
-    const icon = sortCol === i ? (sortDir === 1 ? '↑' : '↓') : '↕';
+    if (ss.col === i) cls = ss.dir === 1 ? ' sorted-asc' : ' sorted-desc';
+    const icon = ss.col === i ? (ss.dir === 1 ? '↑' : '↓') : '↕';
     return `<th data-colidx="${i}" class="${cls}">${esc(c)} <span class="sort-icon">${icon}</span></th>`;
   }).join('');
 
@@ -1454,12 +1694,17 @@ document.getElementById('r-scroll').addEventListener('click', e => {
   }
   const th = e.target.closest('th[data-colidx]');
   if (!th) return;
+  const table = th.closest('table[data-resultidx]');
+  const ridx = table ? parseInt(table.dataset.resultidx) : 0;
   const ci = parseInt(th.dataset.colidx);
-  if (sortCol === ci) sortDir *= -1;
-  else { sortCol = ci; sortDir = 1; }
+  if (!sortState[ridx]) sortState[ridx] = { col: null, dir: 1 };
+  if (sortState[ridx].col === ci) sortState[ridx].dir *= -1;
+  else { sortState[ridx].col = ci; sortState[ridx].dir = 1; }
   if (lastResultData) {
-    const html = lastResultData.map((r, i) => renderResultTable(r.columns, r.values, i)).join('');
-    document.getElementById('r-scroll').innerHTML = html;
+    const scroll = document.getElementById('r-scroll');
+    const noticeEl = scroll.querySelector('.convert-notice');
+    const noticeHtml = noticeEl ? noticeEl.outerHTML : '';
+    scroll.innerHTML = noticeHtml + lastResultData.map((r, i) => renderResultTable(r.columns, r.values, i)).join('');
   }
 });
 
@@ -1468,7 +1713,7 @@ function runSQL() {
   const rawSql = getEditorSQL().trim();
   if (!rawSql) return;
 
-  sortCol = null; sortDir = 1;
+  sortState = {};
   const btn = document.getElementById('btn-run');
   btn.classList.add('loading'); btn.disabled = true;
 
@@ -1477,6 +1722,7 @@ function runSQL() {
     ? `<div class="convert-notice"><i class="ti ti-arrows-exchange"></i><span><b>Oracle → SQLite 자동 변환 완료</b> &nbsp;·&nbsp; ${changes.map(c=>`<code>${esc(c)}</code>`).join(' &nbsp; ')}</span></div>`
     : '';
 
+  addToHistory(rawSql);
   const t0 = performance.now();
 
   setTimeout(() => {
@@ -1489,12 +1735,14 @@ function runSQL() {
         document.getElementById('r-scroll').innerHTML =
           `${convertedHtml}<div class="msg-box msg-ok"><i class="ti ti-check" style="font-size:18px;flex-shrink:0;"></i><div>명령어가 성공적으로 실행되었습니다.</div></div>`;
         lastResultData = null;
+        refreshDynamicSchema();
       } else {
         lastResultData = results;
         const totalRows = results.reduce((s, r) => s + r.values.length, 0);
         document.getElementById('r-meta').textContent = `✔ ${totalRows}행`;
         document.getElementById('r-scroll').innerHTML = convertedHtml + results.map((r, i) => renderResultTable(r.columns, r.values, i)).join('');
       }
+      refreshDynamicSchema();
     } catch(e) {
       const ms = (performance.now() - t0).toFixed(1);
       document.getElementById('r-time').textContent = ms + ' ms';
@@ -1503,7 +1751,7 @@ function runSQL() {
       const oracleWarn = unsupported.length
         ? `<div class="oracle-unsupported-hint">⚠ Oracle 전용 문법 감지: <strong>${unsupported.join(', ')}</strong><br>SQLite에서 지원되지 않습니다. 우측 패널에서 대체 구문을 확인하세요.</div>`
         : '';
-      document.getElementById('r-scroll').innerHTML = `${convertedHtml}<div class="msg-box msg-err"><strong>SQL Error</strong><br>${esc(e.message)}</div>${oracleWarn}`;
+      document.getElementById('r-scroll').innerHTML = `${convertedHtml}<div class="msg-box msg-err"><strong>SQL Error</strong><br>${friendlyError(e.message)}</div>${oracleWarn}`;
       lastResultData = null;
     }
     btn.classList.remove('loading'); btn.disabled = false;
@@ -1573,6 +1821,78 @@ document.getElementById('btn-progress-reset').addEventListener('click', () => {
   localStorage.removeItem('sqld-done');
   renderExamples();
   toast('학습 진행도가 초기화되었습니다');
+});
+
+// 예제 검색
+document.getElementById('ex-search').addEventListener('input', e => {
+  exSearch = e.target.value;
+  renderExamples();
+});
+
+// 연습 모드 토글
+document.getElementById('btn-practice').addEventListener('click', () => {
+  practiceMode = !practiceMode;
+  document.getElementById('btn-practice').classList.toggle('active', practiceMode);
+  renderExamples();
+  toast(practiceMode ? '연습 모드 ON — 예제 클릭 시 SQL이 로드되지 않습니다' : '연습 모드 OFF');
+});
+
+// 쿼리 히스토리
+function addToHistory(sql) {
+  const t = sql.trim();
+  if (!t || t === DEFAULT_QUERY.trim()) return;
+  queryHistory = [t, ...queryHistory.filter(q => q !== t)].slice(0, 15);
+  localStorage.setItem('sqld-history', JSON.stringify(queryHistory));
+}
+function renderHistory() {
+  const panel = document.getElementById('history-panel');
+  if (!queryHistory.length) {
+    panel.innerHTML = '<div class="history-hd"><span class="history-hd-label">실행 이력</span></div><div class="history-empty">이력이 없습니다</div>';
+    return;
+  }
+  panel.innerHTML = `<div class="history-hd">
+    <span class="history-hd-label">실행 이력</span>
+    <button class="history-clear" id="btn-history-clear">전체 삭제</button>
+  </div>` + queryHistory.map((sql, i) => {
+    const preview = sql.replace(/\s+/g, ' ').trim();
+    return `<div class="history-item" data-idx="${i}" title="${esc(preview)}">\
+<div class="history-item-sql">${esc(preview.slice(0, 80) + (preview.length > 80 ? '…' : ''))}</div></div>`;
+  }).join('');
+  document.getElementById('btn-history-clear')?.addEventListener('click', e => {
+    e.stopPropagation();
+    queryHistory = [];
+    localStorage.removeItem('sqld-history');
+    renderHistory();
+    toast('이력을 삭제했습니다');
+  });
+}
+document.getElementById('btn-history').addEventListener('click', e => {
+  e.stopPropagation();
+  const panel = document.getElementById('history-panel');
+  const isOpen = panel.classList.contains('show');
+  if (!isOpen) {
+    const rect = document.getElementById('btn-history').getBoundingClientRect();
+    panel.style.top  = (rect.bottom + 6) + 'px';
+    panel.style.right = (window.innerWidth - rect.right) + 'px';
+    renderHistory();
+  }
+  panel.classList.toggle('show', !isOpen);
+});
+document.getElementById('history-panel').addEventListener('click', e => {
+  const item = e.target.closest('.history-item');
+  if (!item) return;
+  const idx = parseInt(item.dataset.idx);
+  if (!isNaN(idx) && queryHistory[idx]) {
+    setEditorSQL(queryHistory[idx]);
+    switchTab('query');
+    document.getElementById('history-panel').classList.remove('show');
+    toast('이력에서 로드했습니다');
+  }
+});
+document.addEventListener('click', e => {
+  if (!e.target.closest('.history-wrap')) {
+    document.getElementById('history-panel').classList.remove('show');
+  }
 });
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') { closeModal(); closeGuide(); }
