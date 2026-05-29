@@ -769,6 +769,8 @@ kbd{background:var(--bg3);border:1px solid var(--border);border-bottom:2px solid
           <li>결과 컬럼 헤더 클릭 → 해당 컬럼 기준 <strong>오름/내림차순 정렬</strong></li>
           <li>결과 우측 상단 <button class="btn-csv-inline" style="pointer-events:none;cursor:default;vertical-align:middle;display:inline-flex;"><i class="ti ti-copy"></i> CSV</button> 버튼으로 결과를 클립보드에 복사</li>
           <li>SELECT · DML · DDL 등 모든 SQL 구문을 에디터에 직접 작성해 실행할 수 있습니다</li>
+          <li>SELECT 결과가 없을 때는 <strong>"조건에 맞는 결과가 없습니다 (0행 반환)"</strong>으로 표시 — DML 성공 메시지와 구분됩니다</li>
+          <li>INSERT · UPDATE · DELETE 실행 후 결과창에 <strong>F5 DB 복구 안내</strong>가 자동으로 표시됩니다</li>
           <li>에디터 내용은 <strong>자동저장</strong> — 브라우저를 닫았다 열어도 마지막 내용 유지</li>
         </ul>
       </div>
@@ -778,11 +780,13 @@ kbd{background:var(--bg3);border:1px solid var(--border);border-bottom:2px solid
         <div class="modal-section-title">4 · 예제 패널 100% 활용하기</div>
         <ul class="guide-list">
           <li>총 <strong>61개 예제</strong> / 18개 카테고리 (SELECT, JOIN, 서브쿼리, 윈도우 함수, DML, DDL 등)</li>
-          <li>상단 <strong>카테고리 탭</strong>으로 원하는 주제만 필터링</li>
-          <li>예제 카드 클릭 → 해당 SQL이 <strong>에디터에 자동 로드</strong></li>
+          <li>상단 <strong>카테고리 탭</strong>으로 원하는 주제만 필터링 — 예제 이름·설명·SQL 키워드로 <strong>검색</strong>도 가능</li>
+          <li>예제 카드 클릭 → 해당 SQL이 <strong>에디터에 자동 로드</strong> (다른 카드 클릭 시 열린 힌트·해설 자동 닫힘)</li>
           <li><button class="ex-hint-btn" style="pointer-events:none;cursor:default;vertical-align:middle;">💡 힌트</button> : 풀이 방향 키워드 제공 (먼저 스스로 풀어보세요!)</li>
           <li><button class="ex-sol-btn" style="pointer-events:none;cursor:default;vertical-align:middle;">📖 해설</button> : 문법 설명 + SQLD 시험 출제 포인트 안내</li>
-          <li><span class="ex-check" style="display:inline-flex;pointer-events:none;vertical-align:middle;margin-right:2px;"></span> 카드 우측 동그라미 클릭 → <strong>완료 체크</strong> (진행도 자동 저장)</li>
+          <li><span class="ex-check" style="display:inline-flex;pointer-events:none;vertical-align:middle;margin-right:2px;"></span> 카드 우측 동그라미 클릭 → <strong>완료 체크</strong> — 스크롤 위치가 유지되며 진행도 자동 저장</li>
+          <li>패널 상단 <strong>초록색 progress bar</strong>로 전체 진행률을 시각적으로 확인 가능</li>
+          <li><button class="btn-practice" style="pointer-events:none;cursor:default;vertical-align:middle;display:inline-flex;"><i class="ti ti-pencil"></i> 연습</button> <strong>연습 모드</strong> ON 시 예제 클릭해도 SQL이 로드되지 않아 직접 작성 연습 — 설정은 새로고침 후에도 유지</li>
           <li>진행도 전체 초기화는 우측 패널 상단 <button class="btn-progress-reset" style="pointer-events:none;cursor:default;vertical-align:middle;display:inline-flex;"><i class="ti ti-rotate-clockwise"></i> 초기화</button> 버튼</li>
         </ul>
       </div>
@@ -792,9 +796,11 @@ kbd{background:var(--bg3);border:1px solid var(--border);border-bottom:2px solid
         <div class="modal-section-title">5 · 스키마 패널 활용하기</div>
         <ul class="guide-list">
           <li><strong>테이블 이름 클릭</strong> → 에디터에 <code>SELECT * FROM 테이블명;</code> 자동 삽입</li>
-          <li>테이블 옆 <strong>▶</strong> 아이콘 클릭 → 컬럼 목록 펼치기/접기</li>
+          <li>테이블 옆 <i class="ti ti-chevron-down" style="vertical-align:middle;font-size:13px;color:var(--text2);"></i> 아이콘 클릭 → 컬럼 목록 펼치기/접기</li>
           <li><strong>컬럼 이름 클릭</strong> → 현재 커서 위치에 컬럼명 삽입</li>
           <li><span class="badge badge-pk">PK</span> 기본키 &nbsp;·&nbsp; <span class="badge badge-fk">FK</span> 외래키 — 어떤 컬럼으로 조인할지 바로 확인 가능</li>
+          <li>테이블 행의 <i class="ti ti-info-circle" style="vertical-align:middle;font-size:13px;color:var(--text2);"></i> 버튼 → <strong>상세 스키마 모달</strong> 팝업 (컬럼·타입·PK/FK·관계 한눈에 확인, SELECT 바로 실행 가능)</li>
+          <li>패널 상단 <strong>ERD 다이어그램 보기</strong> 버튼 → 10개 테이블 간 FK 관계를 시각적으로 확인 — 테이블 클릭 시 SELECT 자동 로드</li>
           <li>상단 <strong>검색창</strong>에서 테이블명·컬럼명으로 빠르게 필터링</li>
         </ul>
       </div>
@@ -847,11 +853,12 @@ kbd{background:var(--bg3);border:1px solid var(--border);border-bottom:2px solid
       <div>
         <div class="modal-section-title">8 · 자주 하는 실수 &amp; 주의사항</div>
         <ul class="guide-list">
-          <li><code>WHERE</code> 없이 <code>UPDATE</code> / <code>DELETE</code> 실행 시 <strong>전체 행이 변경</strong>됩니다 — 실수했다면 <strong>브라우저를 새로고침(F5)</strong>하면 DB가 원래 상태로 복구됩니다</li>
+          <li><code>WHERE</code> 없이 <code>UPDATE</code> / <code>DELETE</code> 실행 시 <strong>전체 행이 변경</strong>됩니다 — DML 실행 후 결과창에 자동으로 <kbd>F5</kbd> 복구 안내가 표시됩니다</li>
+          <li>SELECT 결과가 빈 경우 "0행 반환" 메시지로 표시됩니다 — 쿼리 문법은 맞지만 조건에 해당하는 데이터가 없는 것이므로 WHERE 조건을 확인하세요</li>
           <li><code>GROUP BY</code>에 없는 컬럼을 <code>SELECT</code>에 단독으로 쓰면 <strong>오류 발생</strong></li>
           <li><code>AVG()</code> · <code>COUNT(컬럼)</code>은 NULL 행 <strong>자동 제외</strong> — <code>COUNT(*)</code>와 결과가 다를 수 있음</li>
           <li>Oracle의 날짜 직접 비교는 SQLite에서 <strong>문자열 비교</strong>로 동작 — 날짜 형식을 통일해서 작성 필요</li>
-          <li>브라우저 탭을 닫아도 진행도와 에디터 내용은 <strong>자동 저장</strong>됨 (같은 브라우저 기준)</li>
+          <li>브라우저 탭을 닫아도 <strong>에디터 내용 · 진행도 · 패널 너비 · 연습 모드 설정</strong>이 모두 자동 저장됩니다 (같은 브라우저 기준)</li>
         </ul>
       </div>
 
