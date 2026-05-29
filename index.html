@@ -109,7 +109,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
 .col-item:hover{background:rgba(59,130,246,0.06);padding-left:4px;}
 .col-item:hover .col-name{color:var(--blue);}
 .col-name{flex:1;}
-.col-type{font-size:9px;opacity:.55;}
+.col-type{font-size:9px;opacity:.8;}
 .badge{font-size:8px;font-weight:700;border-radius:3px;padding:0 3px;line-height:1.5;flex-shrink:0;}
 .badge-pk{color:#DC2626;border:1px solid rgba(220,38,38,0.4);background:rgba(220,38,38,0.06);}
 .badge-fk{color:var(--blue);border:1px solid rgba(59,130,246,0.35);background:rgba(59,130,246,0.06);}
@@ -637,6 +637,9 @@ kbd{background:var(--bg3);border:1px solid var(--border);border-bottom:2px solid
       <button class="btn-panel-toggle-r" id="btn-toggle-right" title="패널 접기">
         <i class="ti ti-layout-sidebar-right-collapse"></i>
       </button>
+    </div>
+    <div id="ex-progress-bar" style="height:3px;background:var(--bg4);flex-shrink:0;">
+      <div id="ex-progress-fill" style="height:100%;background:var(--green);transition:width .35s ease;width:0%"></div>
     </div>
     <div class="ex-search-wrap">
       <i class="ti ti-search"></i>
@@ -1377,7 +1380,7 @@ let saveTimer = null;
 let schemaFilter = '';
 let catFilter = 'ALL';
 let exSearch = '';
-let practiceMode = false;
+let practiceMode = localStorage.getItem('sqld-practice-mode') === '1';
 let queryHistory = JSON.parse(localStorage.getItem('sqld-history') || '[]');
 let completed = new Set(JSON.parse(localStorage.getItem('sqld-done') || '[]'));
 let lastResultData = null;
@@ -1626,6 +1629,9 @@ function renderCatPills() {
 
 function updateProgress() {
   document.getElementById('ex-progress').textContent = `${completed.size} / ${TOTAL}`;
+  const pct = TOTAL > 0 ? (completed.size / TOTAL * 100) : 0;
+  const fill = document.getElementById('ex-progress-fill');
+  if (fill) fill.style.width = pct.toFixed(1) + '%';
 }
 
 function renderExamples() {
@@ -1677,10 +1683,13 @@ document.getElementById('ex-panel').addEventListener('click', e => {
   if (checkBtn) {
     e.stopPropagation();
     const key = checkBtn.dataset.key;
+    const panelEl = document.getElementById('ex-panel');
+    const savedScroll = panelEl.scrollTop;
     if (completed.has(key)) completed.delete(key);
     else completed.add(key);
     localStorage.setItem('sqld-done', JSON.stringify([...completed]));
     renderExamples();
+    panelEl.scrollTop = savedScroll;
     return;
   }
   const hintBtn = e.target.closest('.ex-hint-btn');
@@ -1707,10 +1716,9 @@ document.getElementById('ex-panel').addEventListener('click', e => {
   }
   const item = e.target.closest('.ex-item');
   if (item) {
-    const cur = getEditorSQL().trim();
-    if (cur && cur !== DEFAULT_QUERY.trim()) {
-      if (!confirm('현재 작성 중인 SQL이 있습니다. 예제로 교체하겠습니까?')) return;
-    }
+    document.querySelectorAll('#ex-panel .ex-expand-box').forEach(b => { b.style.display = 'none'; });
+    document.querySelectorAll('#ex-panel .ex-hint-btn').forEach(b => { b.textContent = '💡 힌트'; b.classList.remove('open'); });
+    document.querySelectorAll('#ex-panel .ex-sol-btn').forEach(b => { b.textContent = '📖 해설'; b.classList.remove('open'); });
     if (practiceMode) {
       setEditorSQL('');
       editorView && editorView.focus();
@@ -1907,9 +1915,20 @@ function runSQL() {
       const ms = (performance.now() - t0).toFixed(1);
       document.getElementById('r-time').textContent = ms + ' ms';
       if (!results.length) {
-        document.getElementById('r-meta').textContent = '✔ 실행 완료';
-        document.getElementById('r-scroll').innerHTML =
-          `${convertedHtml}<div class="msg-box msg-ok"><i class="ti ti-check" style="font-size:18px;flex-shrink:0;"></i><div>명령어가 성공적으로 실행되었습니다.</div></div>`;
+        const isSelect = /^\s*SELECT\b/i.test(sql);
+        const isDML = /^\s*(INSERT|UPDATE|DELETE)\b/i.test(sql);
+        if (isSelect) {
+          document.getElementById('r-meta').textContent = '✔ 0행';
+          document.getElementById('r-scroll').innerHTML =
+            `${convertedHtml}<div class="msg-box msg-ok"><i class="ti ti-table-off" style="font-size:18px;flex-shrink:0;"></i><div>조건에 맞는 결과가 없습니다 <span style="color:var(--text3);font-size:11px;">(0행 반환)</span></div></div>`;
+        } else {
+          document.getElementById('r-meta').textContent = '✔ 실행 완료';
+          const dmlNote = isDML
+            ? `<br><span style="font-size:11px;color:var(--text3);margin-top:4px;display:inline-block;">데이터가 변경되었습니다. <kbd style="background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:1px 6px;font-size:10px;">F5</kbd> 로 DB를 초기 상태로 복구할 수 있습니다.</span>`
+            : '';
+          document.getElementById('r-scroll').innerHTML =
+            `${convertedHtml}<div class="msg-box msg-ok"><i class="ti ti-check" style="font-size:18px;flex-shrink:0;"></i><div>명령어가 성공적으로 실행되었습니다.${dmlNote}</div></div>`;
+        }
         lastResultData = null;
         refreshDynamicSchema();
       } else {
@@ -2018,6 +2037,7 @@ document.getElementById('ex-search').addEventListener('input', e => {
 // 연습 모드 토글
 document.getElementById('btn-practice').addEventListener('click', () => {
   practiceMode = !practiceMode;
+  localStorage.setItem('sqld-practice-mode', practiceMode ? '1' : '0');
   document.getElementById('btn-practice').classList.toggle('active', practiceMode);
   renderExamples();
   toast(practiceMode ? '연습 모드 ON — 예제 클릭 시 SQL이 로드되지 않습니다' : '연습 모드 OFF');
@@ -2072,6 +2092,10 @@ document.getElementById('history-panel').addEventListener('click', e => {
     setEditorSQL(queryHistory[idx]);
     editorView && editorView.focus();
     document.getElementById('history-panel').classList.remove('show');
+    document.getElementById('r-scroll').innerHTML = '<div class="result-placeholder"><i class="ti ti-player-play"></i><p>SQL을 작성하고 실행해보세요</p></div>';
+    document.getElementById('r-meta').textContent = '';
+    document.getElementById('r-time').textContent = '';
+    lastResultData = null;
     toast('이력에서 로드했습니다');
   }
 });
@@ -2214,6 +2238,7 @@ async function init() {
   renderDBPanel();
   renderCatPills();
   renderExamples();
+  if (practiceMode) document.getElementById('btn-practice').classList.add('active');
 
   if (!localStorage.getItem('sqld-no-show')) {
     setTimeout(openModal, 500);
