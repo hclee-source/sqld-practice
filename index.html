@@ -113,6 +113,53 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
   background:var(--bg3);border-bottom:1px solid var(--border);gap:2px;}
 .editor-label{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;
   color:var(--primary);font-family:var(--sans);padding:0 6px;}
+/* ── 스키마 상세 버튼 ── */
+.tbl-info-btn{display:flex;align-items:center;justify-content:center;padding:2px;background:none;
+  border:none;color:var(--text3);cursor:pointer;border-radius:4px;transition:.12s;flex-shrink:0;line-height:1;}
+.tbl-info-btn:hover{color:var(--primary);background:rgba(240,75,35,0.12);}
+/* ── 스키마 상세 모달 ── */
+#schema-detail-modal{position:fixed;inset:0;background:rgba(5,8,20,.6);z-index:3000;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:.18s;}
+#schema-detail-modal.show{opacity:1;pointer-events:all;}
+.sdm-box{background:var(--bg2);border:1px solid var(--border);border-radius:14px;
+  width:460px;max-height:78vh;display:flex;flex-direction:column;overflow:hidden;
+  box-shadow:0 24px 64px rgba(0,0,0,.5);transform:translateY(10px);transition:.18s;}
+#schema-detail-modal.show .sdm-box{transform:translateY(0);}
+.sdm-hd{display:flex;align-items:center;gap:10px;padding:16px 18px;
+  border-bottom:1px solid var(--border);background:var(--bg3);flex-shrink:0;}
+.sdm-hd-icon{width:32px;height:32px;border-radius:8px;background:rgba(240,75,35,0.12);
+  display:flex;align-items:center;justify-content:center;color:var(--primary);flex-shrink:0;}
+.sdm-title{font-size:15px;font-weight:800;color:var(--text);font-family:var(--mono);letter-spacing:.3px;}
+.sdm-sub{font-size:10px;color:var(--text3);margin-top:1px;}
+.sdm-close{margin-left:auto;background:none;border:none;color:var(--text3);
+  cursor:pointer;padding:5px;border-radius:7px;display:flex;align-items:center;transition:.12s;}
+.sdm-close:hover{color:var(--text);background:var(--bg4);}
+.sdm-body{overflow-y:auto;padding:14px 18px 6px;flex:1;}
+.sdm-body::-webkit-scrollbar{width:3px;}
+.sdm-body::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px;}
+.sdm-col-table{width:100%;border-collapse:collapse;font-size:12px;border-radius:8px;overflow:hidden;}
+.sdm-col-table th{text-align:left;padding:7px 12px;font-size:9px;font-weight:800;
+  color:var(--text3);letter-spacing:1.2px;text-transform:uppercase;
+  background:var(--bg3);border-bottom:1px solid var(--border);}
+.sdm-col-table td{padding:8px 12px;border-bottom:1px solid rgba(48,54,61,.7);vertical-align:middle;}
+.sdm-col-table tbody tr:last-child td{border-bottom:none;}
+.sdm-col-table tbody tr:hover td{background:rgba(240,75,35,0.03);}
+.sdm-col-name{font-family:var(--mono);color:var(--text);font-weight:600;font-size:12px;}
+.sdm-col-type{font-family:var(--mono);color:var(--blue);font-size:11px;}
+.sdm-fk-section{margin-top:10px;padding:10px 12px;
+  background:rgba(56,139,253,0.06);border:1px solid rgba(56,139,253,0.18);border-radius:8px;}
+.sdm-fk-title{font-size:9px;font-weight:800;color:var(--blue);letter-spacing:1.2px;
+  text-transform:uppercase;margin-bottom:6px;}
+.sdm-fk-row{font-size:11px;color:var(--text3);padding:2px 0;display:flex;align-items:center;gap:6px;}
+.sdm-fk-col{font-family:var(--mono);color:var(--text);}
+.sdm-fk-arrow{color:var(--text3);opacity:.6;}
+.sdm-fk-ref{font-family:var(--mono);color:var(--blue);}
+.sdm-ft{padding:12px 18px;border-top:1px solid var(--border);display:flex;gap:8px;flex-shrink:0;}
+.sdm-run-btn{display:flex;align-items:center;gap:5px;padding:7px 14px;flex:1;justify-content:center;
+  background:rgba(240,75,35,0.1);border:1px solid rgba(240,75,35,0.25);border-radius:8px;
+  color:var(--primary);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--mono);transition:.13s;}
+.sdm-run-btn:hover{background:rgba(240,75,35,0.2);border-color:rgba(240,75,35,0.45);}
 .tab{display:flex;align-items:center;gap:6px;padding:0 14px;height:48px;border:none;
   background:transparent;font-size:12px;color:var(--text2);cursor:pointer;
   border-bottom:2px solid transparent;transition:.12s;font-family:var(--sans);font-weight:500;}
@@ -774,6 +821,26 @@ kbd{background:var(--bg3);border:1px solid var(--border);border-bottom:2px solid
   </div>
 </div>
 
+<!-- 스키마 상세 모달 -->
+<div id="schema-detail-modal">
+  <div class="sdm-box">
+    <div class="sdm-hd">
+      <div class="sdm-hd-icon"><i class="ti ti-table" style="font-size:15px;"></i></div>
+      <div>
+        <div class="sdm-title" id="sdm-title"></div>
+        <div class="sdm-sub" id="sdm-sub"></div>
+      </div>
+      <button class="sdm-close" id="sdm-close"><i class="ti ti-x" style="font-size:16px;"></i></button>
+    </div>
+    <div class="sdm-body" id="sdm-body"></div>
+    <div class="sdm-ft">
+      <button class="sdm-run-btn" id="sdm-run-btn">
+        <i class="ti ti-player-play-filled"></i> SELECT * FROM <span id="sdm-run-label"></span>
+      </button>
+    </div>
+  </div>
+</div>
+
 <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
 
 <!-- SQL.js 엔진 -->
@@ -1358,6 +1425,7 @@ function renderDBPanel() {
           <i class="ti ti-table" style="font-size:12px;flex-shrink:0;color:var(--text3);"></i>
           <span class="tbl-hd-name" data-tbl="${t.name}" title="클릭: SELECT * FROM ${t.name}">${t.name}</span>
           <span class="tbl-rows-badge">${t.rows}</span>
+          <button class="tbl-info-btn" data-info="${t.name}" title="상세 스키마 보기"><i class="ti ti-info-circle" style="font-size:13px;"></i></button>
           <i class="ti ti-chevron-right chevron"></i>
         </div>
         <div class="tbl-cols${q ? ' open' : ''}">${colsHtml}</div>
@@ -1381,6 +1449,7 @@ function refreshDynamicSchema() {
         <i class="ti ${type === 'view' ? 'ti-eye' : 'ti-table-plus'}" style="font-size:12px;flex-shrink:0;color:var(--text3);"></i>
         <span class="tbl-hd-name" data-tbl="${name}" title="클릭: SELECT * FROM ${name}">${name}</span>
         <span class="tbl-rows-badge" style="background:rgba(59,130,246,0.08);color:var(--blue);">${type === 'view' ? 'VIEW' : 'TABLE'}</span>
+        <button class="tbl-info-btn" data-info="${name}" title="상세 스키마 보기"><i class="ti ti-info-circle" style="font-size:13px;"></i></button>
         <i class="ti ti-chevron-right chevron"></i>
       </div>
       <div class="tbl-cols"></div>`;
@@ -1395,8 +1464,60 @@ function refreshDynamicSchema() {
   } catch(_) {}
 }
 
+function openSchemaDetail(tblName) {
+  let cols, rowCount, isDynamic = false;
+  const staticTbl = SCHEMA.find(t => t.name === tblName);
+
+  if (staticTbl) {
+    cols = staticTbl.cols.map(c => ({name: c.n, type: c.t, pk: !!c.pk, fk: c.fk || null}));
+    rowCount = staticTbl.rows;
+  } else if (db) {
+    isDynamic = true;
+    try {
+      const pragma = db.exec(`PRAGMA table_info("${tblName}")`);
+      if (!pragma.length) return;
+      cols = pragma[0].values.map(r => ({name: r[1], type: r[2] || 'TEXT', pk: r[5] > 0, fk: null}));
+      const cnt = db.exec(`SELECT COUNT(*) FROM "${tblName}"`);
+      rowCount = cnt.length ? cnt[0].values[0][0] : '?';
+    } catch(_) { return; }
+  } else return;
+
+  document.getElementById('sdm-title').textContent = tblName;
+  document.getElementById('sdm-sub').textContent = `${rowCount}행 · ${cols.length}개 컬럼${isDynamic ? ' · 사용자 생성' : ''}`;
+  document.getElementById('sdm-run-label').textContent = tblName;
+
+  const fkCols = cols.filter(c => c.fk);
+  const fkHtml = fkCols.length
+    ? `<div class="sdm-fk-section">
+        <div class="sdm-fk-title">외래 키 (FK)</div>
+        ${fkCols.map(c => `<div class="sdm-fk-row">
+          <span class="sdm-fk-col">${c.name}</span>
+          <span class="sdm-fk-arrow">→</span>
+          <span class="sdm-fk-ref">${c.fk}</span>
+        </div>`).join('')}
+      </div>` : '';
+
+  document.getElementById('sdm-body').innerHTML = `
+    <table class="sdm-col-table">
+      <thead><tr><th>컬럼명</th><th>타입</th><th>제약</th></tr></thead>
+      <tbody>${cols.map(c => `<tr>
+        <td><span class="sdm-col-name">${esc(c.name)}</span></td>
+        <td><span class="sdm-col-type">${esc(c.type)}</span></td>
+        <td>${c.pk ? '<span class="badge badge-pk">PK</span>' : ''}${c.fk ? ' <span class="badge badge-fk">FK</span>' : ''}</td>
+      </tr>`).join('')}</tbody>
+    </table>${fkHtml}`;
+
+  document.getElementById('schema-detail-modal').classList.add('show');
+}
+
 // Event delegation for schema panel
 document.getElementById('db-scroll').addEventListener('click', e => {
+  const infoBtn = e.target.closest('.tbl-info-btn');
+  if (infoBtn) {
+    e.stopPropagation();
+    openSchemaDetail(infoBtn.dataset.info);
+    return;
+  }
   const colItem = e.target.closest('.col-item');
   if (colItem) {
     const colName = colItem.dataset.col;
@@ -1800,6 +1921,19 @@ document.getElementById('guide-overlay').addEventListener('click', e => {
   if (e.target === document.getElementById('guide-overlay')) closeGuide();
 });
 
+const closeSchemaDetail = () => document.getElementById('schema-detail-modal').classList.remove('show');
+document.getElementById('sdm-close').addEventListener('click', closeSchemaDetail);
+document.getElementById('schema-detail-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('schema-detail-modal')) closeSchemaDetail();
+});
+document.getElementById('sdm-run-btn').addEventListener('click', () => {
+  const tbl = document.getElementById('sdm-title').textContent;
+  setEditorSQL(`SELECT * FROM ${tbl};`);
+  editorView && editorView.focus();
+  closeSchemaDetail();
+  toast(`SELECT * FROM ${tbl}`);
+});
+
 document.getElementById('btn-progress-reset').addEventListener('click', () => {
   if (!confirm('모든 학습 완료 기록을 초기화하겠습니까?')) return;
   completed.clear();
@@ -1880,7 +2014,7 @@ document.addEventListener('click', e => {
   }
 });
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { closeModal(); closeGuide(); }
+  if (e.key === 'Escape') { closeModal(); closeGuide(); document.getElementById('schema-detail-modal').classList.remove('show'); }
 });
 
 /* ════════════════════════════════════════════════════════
