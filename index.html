@@ -492,12 +492,6 @@ kbd{background:var(--bg3);border:1px solid var(--border);border-bottom:2px solid
   <!-- 중: 에디터 + 결과 -->
   <main class="work" id="work">
     <div class="tab-bar">
-      <button class="tab active" id="tab-query" data-tab="query">
-        <i class="ti ti-terminal-2"></i> SQL 쿼리
-      </button>
-      <button class="tab" id="tab-ddl" data-tab="ddl">
-        <i class="ti ti-table-plus"></i> DDL / DML
-      </button>
       <div class="tab-space"></div>
       <div class="history-wrap">
         <button class="btn-sm" id="btn-history" title="실행 이력"><i class="ti ti-history"></i></button>
@@ -683,7 +677,7 @@ kbd{background:var(--bg3);border:1px solid var(--border);border-bottom:2px solid
           <li>세미콜론(<code>;</code>)으로 구분하면 <strong>여러 구문을 한 번에 실행</strong> 가능</li>
           <li>결과 컬럼 헤더 클릭 → 해당 컬럼 기준 <strong>오름/내림차순 정렬</strong></li>
           <li>결과 우측 상단 <button class="btn-csv-inline" style="pointer-events:none;cursor:default;vertical-align:middle;display:inline-flex;"><i class="ti ti-copy"></i> CSV</button> 버튼으로 결과를 클립보드에 복사</li>
-          <li><strong>SQL 쿼리 탭</strong>: SELECT·DML 실행용 / <strong>DDL/DML 탭</strong>: CREATE·ALTER 등 구조 변경용</li>
+          <li>SELECT · DML · DDL 등 모든 SQL 구문을 에디터에 직접 작성해 실행할 수 있습니다</li>
           <li>에디터 내용은 <strong>자동저장</strong> — 브라우저를 닫았다 열어도 마지막 내용 유지</li>
         </ul>
       </div>
@@ -1240,8 +1234,7 @@ function transpileOracle(sql) {
    STATE
 ════════════════════════════════════════════════════════ */
 let db = null;
-let currTab = 'query';
-let tabContent = {query:'-- SQL을 입력하고 Ctrl+Enter로 실행하세요\nSELECT * FROM EMP;', ddl:'-- DDL / DML 구문을 입력하세요\nCREATE TABLE TEST (ID INT);'};
+let editorDoc = DEFAULT_QUERY;
 let editorView = null;
 let saveTimer = null;
 let schemaFilter = '';
@@ -1315,13 +1308,13 @@ function initEditor() {
     if (u.docChanged) {
       clearTimeout(saveTimer);
       saveTimer = setTimeout(() => {
-        localStorage.setItem('sqld-editor-' + currTab, u.state.doc.toString());
+        localStorage.setItem('sqld-editor-query', u.state.doc.toString());
       }, 1000);
     }
   });
 
   editorView = new EditorView({
-    doc: tabContent.query,
+    doc: editorDoc,
     extensions: [basicSetup, sqlLang(), lightTheme, cursorListener],
     parent: document.getElementById('editor-wrap'),
   });
@@ -1339,14 +1332,6 @@ function setEditorSQL(sql) {
 /* ════════════════════════════════════════════════════════
    TAB SWITCHING
 ════════════════════════════════════════════════════════ */
-function switchTab(name) {
-  tabContent[currTab] = getEditorSQL();
-  localStorage.setItem('sqld-editor-' + currTab, tabContent[currTab]);
-  currTab = name;
-  setEditorSQL(tabContent[currTab]);
-  document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
-  editorView && editorView.focus();
-}
 
 /* ════════════════════════════════════════════════════════
    SCHEMA PANEL
@@ -1424,7 +1409,7 @@ document.getElementById('db-scroll').addEventListener('click', e => {
   if (tblName && e.target === tblName) {
     const tbl = tblName.dataset.tbl;
     setEditorSQL(`SELECT * FROM ${tbl};`);
-    switchTab('query');
+    editorView && editorView.focus();
     toast(`SELECT * FROM ${tbl}`);
     return;
   }
@@ -1537,11 +1522,11 @@ document.getElementById('ex-panel').addEventListener('click', e => {
     }
     if (practiceMode) {
       setEditorSQL('');
-      switchTab('query');
+      editorView && editorView.focus();
       toast('연습 모드: SQL을 직접 작성해보세요!');
     } else {
       setEditorSQL(item.dataset.sql);
-      switchTab('query');
+      editorView && editorView.focus();
     }
   }
 });
@@ -1770,9 +1755,6 @@ document.getElementById('btn-clear').addEventListener('click', () => {
 });
 
 
-document.querySelectorAll('.tab').forEach(btn => {
-  btn.addEventListener('click', () => switchTab(btn.dataset.tab));
-});
 document.getElementById('btn-run').addEventListener('click', runSQL);
 
 document.addEventListener('keydown', e => {
@@ -1884,7 +1866,7 @@ document.getElementById('history-panel').addEventListener('click', e => {
   const idx = parseInt(item.dataset.idx);
   if (!isNaN(idx) && queryHistory[idx]) {
     setEditorSQL(queryHistory[idx]);
-    switchTab('query');
+    editorView && editorView.focus();
     document.getElementById('history-panel').classList.remove('show');
     toast('이력에서 로드했습니다');
   }
@@ -1903,9 +1885,7 @@ document.addEventListener('keydown', e => {
 ════════════════════════════════════════════════════════ */
 async function init() {
   const savedQuery = localStorage.getItem('sqld-editor-query');
-  const savedDdl   = localStorage.getItem('sqld-editor-ddl');
-  if (savedQuery) tabContent.query = savedQuery;
-  if (savedDdl)   tabContent.ddl   = savedDdl;
+  if (savedQuery) editorDoc = savedQuery;
 
   initEditor();
 
