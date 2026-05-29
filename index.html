@@ -169,29 +169,30 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
   color:var(--primary);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--mono);transition:.13s;}
 .sdm-run-btn:hover{background:rgba(240,75,35,0.2);border-color:rgba(240,75,35,0.45);}
 /* ── ERD 모달 ── */
-#erd-modal{position:fixed;inset:0;background:rgba(5,8,20,.72);z-index:3000;
+#erd-modal{position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:3000;
   display:flex;align-items:center;justify-content:center;
-  opacity:0;pointer-events:none;transition:.18s;}
+  opacity:0;pointer-events:none;transition:.18s;backdrop-filter:blur(4px);}
 #erd-modal.show{opacity:1;pointer-events:all;}
-.erd-box{background:#0D1117;border:1px solid #30363D;border-radius:14px;
+.erd-box{background:var(--bg2);border:1px solid var(--border);border-radius:14px;
   display:flex;flex-direction:column;overflow:hidden;
   width:min(980px,96vw);max-height:92vh;
-  box-shadow:0 24px 64px rgba(0,0,0,.65);}
+  box-shadow:0 24px 64px rgba(0,0,0,.15),0 4px 16px rgba(0,0,0,.07);}
 .erd-box-hd{display:flex;align-items:center;gap:10px;padding:13px 18px;
-  border-bottom:1px solid #30363D;background:#161B22;flex-shrink:0;}
-.erd-box-title{font-size:14px;font-weight:800;color:#E6EDF3;font-family:var(--sans);}
-.erd-box-sub{font-size:10px;color:#484F58;margin-left:2px;}
-.erd-box-close{margin-left:auto;background:none;border:none;color:#484F58;
+  border-bottom:1px solid var(--border);
+  background:linear-gradient(160deg,var(--bg3) 0%,rgba(240,75,35,0.03) 100%);flex-shrink:0;}
+.erd-box-title{font-size:14px;font-weight:800;color:var(--text);font-family:var(--sans);}
+.erd-box-sub{font-size:10px;color:var(--text3);margin-left:2px;}
+.erd-box-close{margin-left:auto;background:none;border:none;color:var(--text3);
   cursor:pointer;padding:5px;border-radius:7px;display:flex;transition:.12s;}
-.erd-box-close:hover{color:#E6EDF3;background:#21262D;}
-.erd-svg-wrap{overflow:auto;flex:1;padding:20px;background:#0D1117;}
+.erd-box-close:hover{color:var(--text);background:var(--bg4);}
+.erd-svg-wrap{overflow:auto;flex:1;padding:20px;background:var(--bg);}
 .erd-svg-wrap::-webkit-scrollbar{width:5px;height:5px;}
-.erd-svg-wrap::-webkit-scrollbar-thumb{background:#30363D;border-radius:3px;}
-#erd-svg-wrap .erd-tbl{cursor:pointer;transition:opacity .15s;}
-#erd-svg-wrap .erd-tbl:hover > rect:nth-of-type(2){stroke:#E8392A !important;stroke-width:2 !important;}
+.erd-svg-wrap::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px;}
+#erd-svg-wrap .erd-tbl{cursor:pointer;transition:filter .15s;}
+#erd-svg-wrap .erd-tbl:hover > rect:nth-of-type(2){stroke:#F04B23 !important;stroke-width:2 !important;}
 .erd-legend{display:flex;align-items:center;gap:14px;padding:8px 18px;
-  border-top:1px solid #30363D;background:#161B22;flex-shrink:0;
-  font-size:10px;color:#6B7280;font-family:var(--sans);}
+  border-top:1px solid var(--border);background:var(--bg3);flex-shrink:0;
+  font-size:10px;color:var(--text2);font-family:var(--sans);}
 .erd-legend-item{display:flex;align-items:center;gap:5px;}
 .tab{display:flex;align-items:center;gap:6px;padding:0 14px;height:48px;border:none;
   background:transparent;font-size:12px;color:var(--text2);cursor:pointer;
@@ -881,18 +882,18 @@ kbd{background:var(--bg3);border:1px solid var(--border);border-bottom:2px solid
     <div class="erd-svg-wrap" id="erd-svg-wrap"></div>
     <div class="erd-legend">
       <div class="erd-legend-item">
-        <svg width="28" height="10" style="flex-shrink:0"><line x1="0" y1="5" x2="22" y2="5" stroke="#388BFD" stroke-width="1.5"/><polygon points="22,2 28,5 22,8" fill="#388BFD"/></svg>
+        <svg width="28" height="10" style="flex-shrink:0"><line x1="0" y1="5" x2="22" y2="5" stroke="#3B82F6" stroke-width="1.5"/><polygon points="22,2 28,5 22,8" fill="#3B82F6"/></svg>
         FK 참조
       </div>
       <div class="erd-legend-item">
-        <svg width="28" height="10" style="flex-shrink:0"><line x1="0" y1="5" x2="22" y2="5" stroke="#F0883E" stroke-width="1.5" stroke-dasharray="4,3"/><polygon points="22,2 28,5 22,8" fill="#F0883E"/></svg>
+        <svg width="28" height="10" style="flex-shrink:0"><line x1="0" y1="5" x2="22" y2="5" stroke="#EA580C" stroke-width="1.5" stroke-dasharray="4,3"/><polygon points="22,2 28,5 22,8" fill="#EA580C"/></svg>
         자기 참조
       </div>
       <div class="erd-legend-item" style="margin-left:auto;">
-        <span style="background:rgba(232,57,42,0.25);color:#E8392A;font-size:7px;font-weight:800;padding:1px 5px;border-radius:2px;font-family:monospace;">PK</span> 기본 키
+        <span style="background:rgba(220,38,38,0.12);color:#B91C1C;font-size:7px;font-weight:800;padding:1px 5px;border-radius:2px;font-family:monospace;">PK</span> 기본 키
       </div>
       <div class="erd-legend-item">
-        <span style="background:rgba(56,139,253,0.2);color:#388BFD;font-size:7px;font-weight:800;padding:1px 5px;border-radius:2px;font-family:monospace;">FK</span> 외래 키
+        <span style="background:rgba(59,130,246,0.13);color:#1D4ED8;font-size:7px;font-weight:800;padding:1px 5px;border-radius:2px;font-family:monospace;">FK</span> 외래 키
       </div>
     </div>
   </div>
@@ -2131,13 +2132,13 @@ function buildERD() {
   let s = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">
 <defs>
   <marker id="fk-arr" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
-    <polygon points="0,0 7,3.5 0,7" fill="#388BFD" opacity=".85"/>
+    <polygon points="0,0 7,3.5 0,7" fill="#3B82F6"/>
   </marker>
   <marker id="self-arr" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
-    <polygon points="0,0 7,3.5 0,7" fill="#F0883E"/>
+    <polygon points="0,0 7,3.5 0,7" fill="#EA580C"/>
   </marker>
 </defs>
-<rect width="${W}" height="${H}" fill="#0D1117"/>`;
+<rect width="${W}" height="${H}" fill="#EDEEF2"/>`;
 
   // FK lines (drawn behind tables)
   SCHEMA.forEach(t => {
@@ -2147,9 +2148,8 @@ function buildERD() {
       if (!c.fk) return;
       const sy = pos.y + EH + ci * ER + ER / 2;
       if (c.fk === t.name) {
-        // Self-reference: loop left
         const ty = pos.y + EH + ER / 2;
-        s += `<path d="M${pos.x},${sy} C${pos.x-30},${sy} ${pos.x-30},${ty} ${pos.x},${ty}" stroke="#F0883E" stroke-width="1.5" fill="none" stroke-dasharray="5,3" marker-end="url(#self-arr)"/>`;
+        s += `<path d="M${pos.x},${sy} C${pos.x-30},${sy} ${pos.x-30},${ty} ${pos.x},${ty}" stroke="#EA580C" stroke-width="1.5" fill="none" stroke-dasharray="5,3" marker-end="url(#self-arr)"/>`;
         return;
       }
       const tpos = ERD_POS[c.fk];
@@ -2160,7 +2160,7 @@ function buildERD() {
       const sx = pos.x + EW <= tpos.x ? pos.x + EW : pos.x;
       const tx = pos.x + EW <= tpos.x ? tpos.x : tpos.x + EW;
       const cp = Math.max(20, Math.abs(tx - sx) * 0.45);
-      s += `<path d="M${sx},${sy} C${sx+cp},${sy} ${tx-cp},${ty} ${tx},${ty}" stroke="#388BFD" stroke-width="1.5" fill="none" opacity=".8" marker-end="url(#fk-arr)"/>`;
+      s += `<path d="M${sx},${sy} C${sx+cp},${sy} ${tx-cp},${ty} ${tx},${ty}" stroke="#3B82F6" stroke-width="1.5" fill="none" marker-end="url(#fk-arr)"/>`;
     });
   });
 
@@ -2171,27 +2171,28 @@ function buildERD() {
     const {x, y} = pos;
     const h = EH + t.cols.length * ER + EP;
     s += `<g class="erd-tbl" data-tbl="${t.name}"><title>${t.name} · ${t.rows}행 · 클릭하면 SELECT</title>`;
-    s += `<rect x="${x+2}" y="${y+3}" width="${EW}" height="${h}" rx="8" fill="rgba(0,0,0,.35)"/>`;
-    s += `<rect x="${x}" y="${y}" width="${EW}" height="${h}" rx="8" fill="#161B22" stroke="#30363D" stroke-width="1"/>`;
-    s += `<rect x="${x}" y="${y}" width="${EW}" height="${EH}" rx="8" fill="#21262D"/>`;
-    s += `<rect x="${x}" y="${y+EH-5}" width="${EW}" height="5" fill="#21262D"/>`;
-    s += `<text x="${x+EW/2}" y="${y+19}" text-anchor="middle" font-size="11.5" font-weight="800" fill="#E8392A" font-family="'IBM Plex Mono',monospace">${t.name}</text>`;
-    s += `<text x="${x+EW-7}" y="${y+19}" text-anchor="end" font-size="8" fill="#484F58" font-family="'IBM Plex Mono',monospace">${t.rows}행</text>`;
+    s += `<rect x="${x+3}" y="${y+3}" width="${EW}" height="${h}" rx="8" fill="rgba(0,0,0,.07)"/>`;
+    s += `<rect x="${x}" y="${y}" width="${EW}" height="${h}" rx="8" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1"/>`;
+    s += `<rect x="${x}" y="${y}" width="${EW}" height="${EH}" rx="8" fill="rgba(240,75,35,0.09)"/>`;
+    s += `<rect x="${x}" y="${y+EH-5}" width="${EW}" height="5" fill="rgba(240,75,35,0.09)"/>`;
+    s += `<line x1="${x+1}" y1="${y+EH}" x2="${x+EW-1}" y2="${y+EH}" stroke="rgba(240,75,35,0.22)" stroke-width="1"/>`;
+    s += `<text x="${x+EW/2}" y="${y+19}" text-anchor="middle" font-size="11.5" font-weight="800" fill="#F04B23" font-family="'IBM Plex Mono',monospace">${t.name}</text>`;
+    s += `<text x="${x+EW-7}" y="${y+19}" text-anchor="end" font-size="8" fill="#94A3B8" font-family="'IBM Plex Mono',monospace">${t.rows}행</text>`;
     t.cols.forEach((c, i) => {
       const cy = y + EH + i * ER;
-      if (i > 0) s += `<line x1="${x+1}" y1="${cy}" x2="${x+EW-1}" y2="${cy}" stroke="#30363D" stroke-width=".5"/>`;
-      if (c.pk) s += `<rect x="${x+1}" y="${cy}" width="${EW-2}" height="${ER}" fill="rgba(232,57,42,.05)"/>`;
-      s += `<text x="${x+9}" y="${cy+15}" font-size="11" font-weight="${c.pk?'700':'400'}" fill="${c.pk?'#E6EDF3':'#8B949E'}" font-family="'IBM Plex Mono',monospace">${c.n}</text>`;
-      s += `<text x="${x+EW-8}" y="${cy+14}" text-anchor="end" font-size="8.5" fill="#484F58" font-family="'IBM Plex Mono',monospace">${c.t==='INTEGER'?'INT':c.t}</text>`;
+      if (i > 0) s += `<line x1="${x+1}" y1="${cy}" x2="${x+EW-1}" y2="${cy}" stroke="#F1F5F9" stroke-width=".8"/>`;
+      if (c.pk) s += `<rect x="${x+1}" y="${cy}" width="${EW-2}" height="${ER}" fill="rgba(240,75,35,0.04)"/>`;
+      s += `<text x="${x+9}" y="${cy+15}" font-size="11" font-weight="${c.pk?'700':'400'}" fill="${c.pk?'#0F172A':'#475569'}" font-family="'IBM Plex Mono',monospace">${c.n}</text>`;
+      s += `<text x="${x+EW-8}" y="${cy+14}" text-anchor="end" font-size="8.5" fill="#94A3B8" font-family="'IBM Plex Mono',monospace">${c.t==='INTEGER'?'INT':c.t}</text>`;
       let bx = x + EW - 23;
       if (c.pk) {
-        s += `<rect x="${bx}" y="${cy+5}" width="15" height="11" rx="2" fill="rgba(232,57,42,.28)"/>`;
-        s += `<text x="${bx+7.5}" y="${cy+13}" text-anchor="middle" font-size="7" font-weight="800" fill="#E8392A" font-family="sans-serif">PK</text>`;
+        s += `<rect x="${bx}" y="${cy+5}" width="15" height="11" rx="2" fill="rgba(220,38,38,0.12)"/>`;
+        s += `<text x="${bx+7.5}" y="${cy+13}" text-anchor="middle" font-size="7" font-weight="800" fill="#B91C1C" font-family="sans-serif">PK</text>`;
         bx -= 17;
       }
       if (c.fk) {
-        s += `<rect x="${bx}" y="${cy+5}" width="15" height="11" rx="2" fill="rgba(56,139,253,.2)"/>`;
-        s += `<text x="${bx+7.5}" y="${cy+13}" text-anchor="middle" font-size="7" font-weight="800" fill="#388BFD" font-family="sans-serif">FK</text>`;
+        s += `<rect x="${bx}" y="${cy+5}" width="15" height="11" rx="2" fill="rgba(59,130,246,0.13)"/>`;
+        s += `<text x="${bx+7.5}" y="${cy+13}" text-anchor="middle" font-size="7" font-weight="800" fill="#1D4ED8" font-family="sans-serif">FK</text>`;
       }
     });
     s += `</g>`;
