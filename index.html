@@ -2183,7 +2183,8 @@ function buildERD() {
       if (i > 0) s += `<line x1="${x+1}" y1="${cy}" x2="${x+EW-1}" y2="${cy}" stroke="#F1F5F9" stroke-width=".8"/>`;
       if (c.pk) s += `<rect x="${x+1}" y="${cy}" width="${EW-2}" height="${ER}" fill="rgba(240,75,35,0.04)"/>`;
       s += `<text x="${x+9}" y="${cy+15}" font-size="11" font-weight="${c.pk?'700':'400'}" fill="${c.pk?'#0F172A':'#475569'}" font-family="'IBM Plex Mono',monospace">${c.n}</text>`;
-      s += `<text x="${x+EW-8}" y="${cy+14}" text-anchor="end" font-size="8.5" fill="#94A3B8" font-family="'IBM Plex Mono',monospace">${c.t==='INTEGER'?'INT':c.t}</text>`;
+      const badgeCount = (c.pk ? 1 : 0) + (c.fk ? 1 : 0);
+      s += `<text x="${x+EW-8-badgeCount*18}" y="${cy+14}" text-anchor="end" font-size="8.5" fill="#94A3B8" font-family="'IBM Plex Mono',monospace">${c.t==='INTEGER'?'INT':c.t}</text>`;
       let bx = x + EW - 23;
       if (c.pk) {
         s += `<rect x="${bx}" y="${cy+5}" width="15" height="11" rx="2" fill="rgba(220,38,38,0.12)"/>`;
